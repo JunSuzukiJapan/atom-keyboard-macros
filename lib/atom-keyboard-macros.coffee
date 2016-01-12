@@ -61,8 +61,8 @@ module.exports = AtomKeyboardMacros =
     this.setText('end recording keyboard macros.')
     @keySequence.pop() # remove ')' key
     @keySequence.pop() # remove 'shift' key
-#    @keySequence.pop() # remove 'x' key
-#    @keySequence.pop() #() remove 'ctrl' key
+    @keySequence.pop() # remove 'x' key
+    @keySequence.pop() #() remove 'ctrl' key
 
   call_last_kbd_macro: ->
     if @keyCaptured
@@ -82,7 +82,7 @@ module.exports = AtomKeyboardMacros =
         atom.keymaps.handleKeyboardEvent(e)
         hasNextStroke = false
 
-        # TODO: ２ストローク以上のコマンドの場合の処理を追加する。
+        # ２ストローク以上のコマンドの場合の処理
         keystroke = keystrokeForKeyboardEvent(e)
         console.log('keystroke:', keystroke)
         cmd = atom.keymaps.findKeyBindings({keystrokes: keystroke})
@@ -94,4 +94,4 @@ module.exports = AtomKeyboardMacros =
       else
         atom.keymaps.simulateTextInput(e)
 
-    atom.keymaps.clear()
+    #atom.keymaps.clear()
