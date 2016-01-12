@@ -8,7 +8,7 @@ module.exports = AtomKeyboardMacros =
   modalPanel: null
   subscriptions: null
 
-  keyCaptured: false
+  #keyCaptured: false
   eventListener: null
   keySequence: []
 
@@ -27,7 +27,6 @@ module.exports = AtomKeyboardMacros =
     # add event listener
     @keyCaptured = false
     @eventListener = this.newHandleKeyboardEvent.bind(this)
-    window.addEventListener('keydown', @eventListener, true)
 
   deactivate: ->
     @modalPanel.destroy()
@@ -44,20 +43,22 @@ module.exports = AtomKeyboardMacros =
 
   newHandleKeyboardEvent: (e) ->
     #console.log('capture ', @keyCaptured)
-    if @keyCaptured
-      #console.log('Capture ', e)
-      @keySequence.push(e)
+    #if @keyCaptured
+    #  @keySequence.push(e)
+    @keySequence.push(e)
 
   start_kbd_macro: ->
     this.setText('start recording keyboard macros...')
-    if @keyCaptured
-      #beep()
-      return
+    #if @keyCaptured
+    #  #beep()
+    #  return
     @keySequence = []
-    @keyCaptured = true
+    #@keyCaptured = true
+    window.addEventListener('keydown', @eventListener, true)
 
   end_kbd_macro: ->
-    @keyCaptured = false
+    window.removeEventListener('keydown', @eventListener, true)
+    #@keyCaptured = false
     this.setText('end recording keyboard macros.')
     @keySequence.pop() # remove ')' key
     @keySequence.pop() # remove 'shift' key
