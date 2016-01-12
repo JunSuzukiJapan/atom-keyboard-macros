@@ -78,5 +78,7 @@ module.exports = AtomKeyboardMacros =
       if e.altKey || e.ctrlKey || e.metaKey || isPrevCtrlAlt
         atom.keymaps.handleKeyboardEvent(e)
         isPrevCtrlAlt = true
+        # TODO: ２ストローク以上のコマンドの場合の処理を追加する。
+
       else
         atom.keymaps.simulateTextInput(e)
