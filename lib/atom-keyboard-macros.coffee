@@ -1,5 +1,7 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 {CompositeDisposable} = require 'atom'
+{normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
+KeymapManager = atom.KeymapManager
 
 module.exports = AtomKeyboardMacros =
   atomKeyboardMacrosView: null
@@ -72,13 +74,24 @@ module.exports = AtomKeyboardMacros =
 
     # execute macro
     this.setText('execute keyboard macros.')
+    hasNextStroke = false
     for e in @keySequence
-      #console.log('e: ', e)
-      isPrevCtrlAlt = false
-      if e.altKey || e.ctrlKey || e.metaKey || isPrevCtrlAlt
+      console.log('e: ', e)
+
+      if e.altKey || e.ctrlKey || e.metaKey || hasNextStroke
         atom.keymaps.handleKeyboardEvent(e)
-        isPrevCtrlAlt = true
+        hasNextStroke = false
+
         # TODO: ２ストローク以上のコマンドの場合の処理を追加する。
+        keystroke = keystrokeForKeyboardEvent(e)
+        console.log('keystroke:', keystroke)
+        cmd = atom.keymaps.findKeyBindings({keystrokes: keystroke})
+        console.log('cmd: ', cmd)
+        if cmd.length == 0
+          console.log('in command process')
+          hasNextStroke = true
 
       else
         atom.keymaps.simulateTextInput(e)
+
+    atom.keymaps.clear()
