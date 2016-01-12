@@ -7,6 +7,7 @@ module.exports = AtomKeyboardMacros =
   subscriptions: null
 
   keyCaptured: false
+  eventListener: null
   keySequence: []
 
   activate: (state) ->
@@ -21,14 +22,16 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:end_kbd_macro': => @end_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:call_last_kbd_macro': => @call_last_kbd_macro()
 
-    #@originalHandleKeyboardEvent = atom.keymaps.handleKeyboardEvent
+    # add event listener
     @keyCaptured = false
-    window.addEventListener('keydown', this.newHandleKeyboardEvent.bind(this), true)
+    @eventListener = this.newHandleKeyboardEvent.bind(this)
+    window.addEventListener('keydown', @eventListener, true)
 
   deactivate: ->
     @modalPanel.destroy()
     @subscriptions.dispose()
     @atomKeyboardMacrosView.destroy()
+    window.removeEventListener('keydown', @eventListener, true)
 
   serialize: ->
     atomKeyboardMacrosViewState: @atomKeyboardMacrosView.serialize()
@@ -70,4 +73,10 @@ module.exports = AtomKeyboardMacros =
     # execute macro
     this.setText('execute keyboard macros.')
     for e in @keySequence
-      atom.keymaps.handleKeyboardEvent(e)
+      #console.log('e: ', e)
+      isPrevCtrlAlt = false
+      if e.altKey || e.ctrlKey || e.metaKey || isPrevCtrlAlt
+        atom.keymaps.handleKeyboardEvent(e)
+        isPrevCtrlAlt = true
+      else
+        atom.keymaps.simulateTextInput(e)
