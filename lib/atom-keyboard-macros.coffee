@@ -57,8 +57,8 @@ module.exports = AtomKeyboardMacros =
   end_kbd_macro: ->
     @keyCaptured = false
     this.setText('end recording keyboard macros.')
-#    @keySequence.pop() # remove ')' key
-#    @keySequence.pop() # remove 'shift' key
+    @keySequence.pop() # remove ')' key
+    @keySequence.pop() # remove 'shift' key
 #    @keySequence.pop() # remove 'x' key
 #    @keySequence.pop() #() remove 'ctrl' key
 
