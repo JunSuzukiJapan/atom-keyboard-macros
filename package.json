@@ -1,7 +1,7 @@
 {
   "name": "atom-keyboard-macros",
   "main": "./lib/atom-keyboard-macros",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A short description of your package",
   "keywords": [],
   "activationCommands": {
