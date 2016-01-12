@@ -1,14 +1,14 @@
 {
   "name": "atom-keyboard-macros",
   "main": "./lib/atom-keyboard-macros",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A short description of your package",
   "keywords": [],
   "activationCommands": {
     "atom-workspace": [
-        "atom-keyboard-macros:start_kbd_macro",
-        "atom-keyboard-macros:end_kbd_macro",
-        "atom-keyboard-macros:call_last_kbd_macro"
+      "atom-keyboard-macros:start_kbd_macro",
+      "atom-keyboard-macros:end_kbd_macro",
+      "atom-keyboard-macros:call_last_kbd_macro"
     ]
   },
   "repository": "https://github.com/JunSuzukiJapan/atom-keyboard-macros",
@@ -16,6 +16,5 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
