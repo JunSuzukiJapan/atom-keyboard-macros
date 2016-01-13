@@ -43,7 +43,6 @@ module.exports = AtomKeyboardMacros =
     atomKeyboardMacrosViewState: @atomKeyboardMacrosView.serialize()
 
   toggle: ->
-    console.log('toggle')
     if @modalPanel.isVisible()
       @modalPanel.hide()
     else
