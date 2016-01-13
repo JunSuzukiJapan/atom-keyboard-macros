@@ -1,7 +1,7 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
-KeymapManager = atom.KeymapManager
+Compiler = require './keyevents-compiler'
 
 module.exports = AtomKeyboardMacros =
   atomKeyboardMacrosView: null
@@ -11,6 +11,8 @@ module.exports = AtomKeyboardMacros =
   keyCaptured: false
   eventListener: null
   keySequence: []
+  compiler: null
+  compiledCommands: null
 
   activate: (state) ->
     @atomKeyboardMacrosView = new AtomKeyboardMacrosView(state.atomKeyboardMacrosViewState)
@@ -23,10 +25,13 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:start_kbd_macro': => @start_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:end_kbd_macro': => @end_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:call_last_kbd_macro': => @call_last_kbd_macro()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:toggle': => @toggle()
 
     # add event listener
-    @keyCaptured = false
     @eventListener = this.newHandleKeyboardEvent.bind(this)
+
+    @keyCaptured = false
+    @compiler = new Compiler()
 
   deactivate: ->
     @modalPanel.destroy()
@@ -36,6 +41,12 @@ module.exports = AtomKeyboardMacros =
 
   serialize: ->
     atomKeyboardMacrosViewState: @atomKeyboardMacrosView.serialize()
+
+  toggle: ->
+    if @modalPanel.isVisible()
+      @modalPanel.hide()
+    else
+      @modalPanel.show()
 
   setText: (text) ->
     @atomKeyboardMacrosView.setText(text)
@@ -57,10 +68,12 @@ module.exports = AtomKeyboardMacros =
     window.removeEventListener('keydown', @eventListener, true)
     @keyCaptured = false
     this.setText('end recording keyboard macros.')
-    @keySequence.pop() # remove ')' key
-    @keySequence.pop() # remove 'shift' key
-    @keySequence.pop() # remove 'x' key
-    @keySequence.pop() #() remove 'ctrl' key
+    #@keySequence.pop() # remove ')' key
+    #@keySequence.pop() # remove 'shift' key
+    #@keySequence.pop() # remove 'x' key
+    #@keySequence.pop() #() remove 'ctrl' key
+    @compiledCommands = @compiler.compile(@keySequence)
+
 
   call_last_kbd_macro: ->
     if @keyCaptured
@@ -72,6 +85,12 @@ module.exports = AtomKeyboardMacros =
 
     # execute macro
     this.setText('execute keyboard macros.')
+    for cmd in @compiledCommands
+      console.log('execute: ', cmd)
+      cmd.execute()
+
+
+###
     hasNextStroke = false
     for e in @keySequence
       console.log('e: ', e)
@@ -93,3 +112,4 @@ module.exports = AtomKeyboardMacros =
         atom.keymaps.simulateTextInput(e)
 
     #atom.keymaps.clear()
+###
