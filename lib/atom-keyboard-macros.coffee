@@ -1,11 +1,14 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
+RepeatCountView = require './repeat-count-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
 Compiler = require './keyevents-compiler'
 
 module.exports = AtomKeyboardMacros =
   atomKeyboardMacrosView: null
-  modalPanel: null
+  messagePanel: null
+  repeatCountView: null
+  repeatCountPanel: null
   subscriptions: null
 
   keyCaptured: false
@@ -16,7 +19,10 @@ module.exports = AtomKeyboardMacros =
 
   activate: (state) ->
     @atomKeyboardMacrosView = new AtomKeyboardMacrosView(state.atomKeyboardMacrosViewState)
-    @modalPanel = atom.workspace.addBottomPanel(item: @atomKeyboardMacrosView.getElement(), visible: false)
+    @messagePanel = atom.workspace.addBottomPanel(item: @atomKeyboardMacrosView.getElement(), visible: false)
+
+    @repeatCountView = new RepeatCountView(state.repeatCountViewState)
+    @repeatCountPanel = atom.workspace.addModalPanel(item: @repeatCountView.getElement(), visible: false)
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
@@ -25,32 +31,38 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:start_kbd_macro': => @start_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:end_kbd_macro': => @end_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:call_last_kbd_macro': => @call_last_kbd_macro()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:repeat_last_kbd_macro': => @repeat_last_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:toggle': => @toggle()
 
     # add event listener
-    @eventListener = this.newHandleKeyboardEvent.bind(this)
+    @eventListener = @newHandleKeyboardEvent.bind(this)
+
+    @repeatCountView.setCallback(@onGetRepeatCount.bind(this))
 
     @keyCaptured = false
     @compiler = new Compiler()
 
   deactivate: ->
-    @modalPanel.destroy()
+    @repeatCountPanel.destroy()
+    @messagePanel.destroy()
     @subscriptions.dispose()
+    @repeatCountView.destroy()
     @atomKeyboardMacrosView.destroy()
     window.removeEventListener('keydown', @eventListener, true)
 
   serialize: ->
     atomKeyboardMacrosViewState: @atomKeyboardMacrosView.serialize()
+    repeatCountViewState: @repeatCountView.serialize()
 
   toggle: ->
-    if @modalPanel.isVisible()
-      @modalPanel.hide()
+    if @messagePanel.isVisible()
+      @messagePanel.hide()
     else
-      @modalPanel.show()
+      @messagePanel.show()
 
   setText: (text) ->
     @atomKeyboardMacrosView.setText(text)
-    @modalPanel.show()
+    @messagePanel.show()
 
   newHandleKeyboardEvent: (e) ->
     @keySequence.push(e)
@@ -68,12 +80,12 @@ module.exports = AtomKeyboardMacros =
     window.removeEventListener('keydown', @eventListener, true)
     @keyCaptured = false
     this.setText('end recording keyboard macros.')
-    #@keySequence.pop() # remove ')' key
-    #@keySequence.pop() # remove 'shift' key
-    #@keySequence.pop() # remove 'x' key
-    #@keySequence.pop() #() remove 'ctrl' key
     @compiledCommands = @compiler.compile(@keySequence)
 
+  # Private
+  execute_macro_once: ->
+    for cmd in @compiledCommands
+      cmd.execute()
 
   call_last_kbd_macro: ->
     if @keyCaptured
@@ -85,31 +97,22 @@ module.exports = AtomKeyboardMacros =
 
     # execute macro
     this.setText('execute keyboard macros.')
-    for cmd in @compiledCommands
-      console.log('execute: ', cmd)
-      cmd.execute()
+    @execute_macro_once()
+    this.setText('macro executed')
 
+  repeat_last_kbd_macro: ->
+    if @keyCaptured
+      #beep()
+      return
+    if !@keySequence || @keySequence.length == 0
+      this.setText('no keyboard macros.')
+      return
 
-###
-    hasNextStroke = false
-    for e in @keySequence
-      console.log('e: ', e)
+    @repeatCountPanel.show()
 
-      if e.altKey || e.ctrlKey || e.metaKey || hasNextStroke
-        atom.keymaps.handleKeyboardEvent(e)
-        hasNextStroke = false
-
-        # ２ストローク以上のコマンドの場合の処理
-        keystroke = keystrokeForKeyboardEvent(e)
-        console.log('keystroke:', keystroke)
-        cmd = atom.keymaps.findKeyBindings({keystrokes: keystroke})
-        console.log('cmd: ', cmd)
-        if cmd.length == 0
-          console.log('in command process')
-          hasNextStroke = true
-
-      else
-        atom.keymaps.simulateTextInput(e)
-
-    #atom.keymaps.clear()
-###
+  onGetRepeatCount: (count) ->
+    for i in [1..count]
+      this.setText("execute keyboard macro #{i}")
+      @execute_macro_once()
+    this.setText("executed macro #{count} times")
+    @repeatCountPanel.hide()

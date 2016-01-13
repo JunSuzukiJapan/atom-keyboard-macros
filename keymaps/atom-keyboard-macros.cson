@@ -11,3 +11,4 @@
   'ctrl-x (': 'atom-keyboard-macros:start_kbd_macro'
   'ctrl-x )': 'atom-keyboard-macros:end_kbd_macro'
   'ctrl-x e': 'atom-keyboard-macros:call_last_kbd_macro'
+  'ctrl-x ctrl-e': 'atom-keyboard-macros:repeat_last_kbd_macro'

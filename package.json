@@ -9,6 +9,7 @@
       "atom-keyboard-macros:start_kbd_macro",
       "atom-keyboard-macros:end_kbd_macro",
       "atom-keyboard-macros:call_last_kbd_macro",
+      "atom-keyboard-macros:repeat_last_kbd_macro",
       "atom-keyboard-macros:toggle"
     ]
   },
