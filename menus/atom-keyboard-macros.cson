@@ -16,6 +16,10 @@
           'label': 'Execute Macro'
           'command': 'atom-keyboard-macros:call_last_kbd_macro'
         }
+        {
+          'label': 'Toggle Window'
+          'command': 'atom-keyboard-macros:toggle'
+        }
       ]
     }
   ]
@@ -36,6 +40,10 @@
         {
           'label': 'Execute Macro'
           'command': 'atom-keyboard-macros:call_last_kbd_macro'
+        }
+        {
+          'label': 'Toggle Window'
+          'command': 'atom-keyboard-macros:toggle'
         }
       ]
     ]

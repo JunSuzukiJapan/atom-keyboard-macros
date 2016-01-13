@@ -7,7 +7,7 @@ class AtomKeyboardMacrosView
 
     # Create message element
     message = document.createElement('div')
-    message.textContent = "The AtomKeyboardMacros package is Alive! It's ALIVE!"
+    message.textContent = "<<atom-keyboard-macros panel>>"
     message.classList.add('message')
     @element.appendChild(message)
 
