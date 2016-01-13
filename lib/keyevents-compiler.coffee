@@ -43,7 +43,7 @@ class Compiler
           if not @isAtomKeyboardMacrosCommand(bindings)
             result.push(new KeydownCommand([e]))
 
-      else if e.keyIdentifier == 'Enter'
+      else if @isNotCharKey(e)
         if isTextMode
           isTextMode = false
           if seq.length > 0
@@ -64,6 +64,10 @@ class Compiler
           seq = [e]
 
     result
+
+  isNotCharKey: (e) ->
+    e.keyIdentifier.match(/Enter|Up|Down|Left|Right|PageUp|PageDown/) ||
+    e.keyCode < 32
 
   isAtomKeyboardMacrosCommand: (bindings) ->
     for keybind in bindings
