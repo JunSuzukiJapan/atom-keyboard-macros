@@ -89,7 +89,7 @@ module.exports = AtomKeyboardMacros =
 
   call_last_kbd_macro: ->
     if @keyCaptured
-      #beep()
+      atom.beep()
       return
     if !@keySequence || @keySequence.length == 0
       this.setText('no keyboard macros.')
@@ -102,13 +102,14 @@ module.exports = AtomKeyboardMacros =
 
   repeat_last_kbd_macro: ->
     if @keyCaptured
-      #beep()
+      atom.beep()
       return
     if !@keySequence || @keySequence.length == 0
       this.setText('no keyboard macros.')
       return
 
     @repeatCountPanel.show()
+    @repeatCountView.input.focus()
 
   onGetRepeatCount: (count) ->
     for i in [1..count]

@@ -13,24 +13,24 @@ class RepeatCountView
     message.classList.add('message')
     @element.appendChild(message)
 
+    self = this
+#    form = document.createElement('form')
+#    form.onsubmit = (e) ->
+#      if self.callback
+#        self.callback(self.input.value)
+#    message.appendChild(form)
+
     @input = document.createElement('input')
     @input.type = 'number'
-    @input.value = 1
+    @input.defaultValue = 1
     message.appendChild(@input)
-    ###
-    @input.onsubmit = (e) ->
-      console.log('submit')
-      if @callback and @input.value
-        @callback(@input.value)
-    ###
 
-    self = this
     button = document.createElement('button')
-    button.textContent = 'Execute'
+    button.type = 'submit'
+    button.textContent = 'Execute Macro'
     button.onclick = (e) ->
       if self.callback
         self.callback(self.input.value)
-      #self.getElement().hide()
     message.appendChild(button)
 
   # Returns an object that can be retrieved when package is activated
