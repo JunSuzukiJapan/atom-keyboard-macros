@@ -112,7 +112,6 @@ module.exports = AtomKeyboardMacros =
 
     @repeatCountPanel.show()
     @repeatCountView.input.focus()
-    console.log('add escapeListener')
     window.addEventListener('keydown', @escapeListener, true)
 
   onEscapeKey: (e) ->
