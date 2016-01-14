@@ -14,11 +14,6 @@ class RepeatCountView
     @element.appendChild(message)
 
     self = this
-#    form = document.createElement('form')
-#    form.onsubmit = (e) ->
-#      if self.callback
-#        self.callback(self.input.value)
-#    message.appendChild(form)
 
     @input = document.createElement('input')
     @input.type = 'number'

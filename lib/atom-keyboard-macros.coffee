@@ -13,6 +13,7 @@ module.exports = AtomKeyboardMacros =
 
   keyCaptured: false
   eventListener: null
+  escapeListener: null
   keySequence: []
   compiler: null
   compiledCommands: null
@@ -34,8 +35,9 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:repeat_last_kbd_macro': => @repeat_last_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:toggle': => @toggle()
 
-    # add event listener
+    # make event listener
     @eventListener = @newHandleKeyboardEvent.bind(this)
+    @escapeListener = @onEscapeKey.bind(this)
 
     @repeatCountView.setCallback(@onGetRepeatCount.bind(this))
 
@@ -110,6 +112,15 @@ module.exports = AtomKeyboardMacros =
 
     @repeatCountPanel.show()
     @repeatCountView.input.focus()
+    console.log('add escapeListener')
+    window.addEventListener('keydown', @escapeListener, true)
+
+  onEscapeKey: (e) ->
+    keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
+    if keystroke == 'escape'
+      @repeatCountPanel.hide()
+      window.removeEventListener('keydown', @escapeListener, true)
+
 
   onGetRepeatCount: (count) ->
     for i in [1..count]
