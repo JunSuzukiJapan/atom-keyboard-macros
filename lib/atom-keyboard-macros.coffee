@@ -1,5 +1,6 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 RepeatCountView = require './repeat-count-view'
+OneLineInputView = require './one-line-input-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
 Compiler = require './keyevents-compiler'
@@ -9,6 +10,8 @@ module.exports = AtomKeyboardMacros =
   messagePanel: null
   repeatCountView: null
   repeatCountPanel: null
+  oneLineInputView: null
+  oneLineInputPanel: null
   subscriptions: null
 
   keyCaptured: false
@@ -18,12 +21,18 @@ module.exports = AtomKeyboardMacros =
   compiler: null
   compiledCommands: null
 
+  runningName_last_kbd_macro: false
+  runningExecute_named_macro: false
+
   activate: (state) ->
     @atomKeyboardMacrosView = new AtomKeyboardMacrosView(state.atomKeyboardMacrosViewState)
     @messagePanel = atom.workspace.addBottomPanel(item: @atomKeyboardMacrosView.getElement(), visible: false)
 
     @repeatCountView = new RepeatCountView(state.repeatCountViewState)
     @repeatCountPanel = atom.workspace.addModalPanel(item: @repeatCountView.getElement(), visible: false)
+
+    @oneLineInputView = new OneLineInputView(state.oneLineInputViewState)
+    @oneLineInputPanel = atom.workspace.addModalPanel(item: @oneLineInputView.getElement(), visible: false)
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
@@ -36,12 +45,15 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_macro_to_bottom': => @execute_macro_to_bottom()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_macro_from_top_to_bottom': => @execute_macro_from_top_to_bottom()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:toggle': => @toggle()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:name_last_kbd_macro': => @name_last_kbd_macro()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_named_macro': => @execute_named_macro()
 
     # make event listener
     @eventListener = @newHandleKeyboardEvent.bind(this)
     @escapeListener = @onEscapeKey.bind(this)
 
     @repeatCountView.setCallback(@onGetRepeatCount.bind(this))
+    @oneLineInputView.setCallback(@onLineInput.bind(this))
 
     @keyCaptured = false
     @compiler = new Compiler()
@@ -68,6 +80,7 @@ module.exports = AtomKeyboardMacros =
     @atomKeyboardMacrosView.setText(text)
     @messagePanel.show()
 
+  # @eventListener
   newHandleKeyboardEvent: (e) ->
     @keySequence.push(e)
 
@@ -94,8 +107,60 @@ module.exports = AtomKeyboardMacros =
 
   # Util method: execute macro once
   execute_macro_once: ->
-    for cmd in @compiledCommands
+    @execute_macro_commands @compiledCommands
+
+  execute_macro_commands: (cmds) ->
+    for cmd in cmds
       cmd.execute()
+
+  #
+  # name last keyboard macro
+  #
+  name_last_kbd_macro: ->
+    @runningName_last_kbd_macro = true
+    @oneLineInputPanel.show()
+    @oneLineInputView.input.focus()
+    window.addEventListener('keydown', @escapeListener, true)
+
+  name_last_kbd_macro_with_string: (name) ->
+    if @keyCaptured
+      atom.beep()
+      return
+
+    if @compiledCommands and @compiledCommands.length > 0
+      self = this
+      atom.commands.add 'atom-workspace', ('atom-keyboard-macros:' + name), ->
+        self.execute_macro_commands self.compiledCommands
+
+    else
+      atom.beep()
+
+  #
+  # execute named macro
+  #
+  execute_named_macro: ->
+    @runningExecute_named_macro = true
+    @oneLineInputPanel.show()
+    @oneLineInputView.input.focus()
+    window.addEventListener('keydown', @escapeListener, true)
+
+  execute_named_macro_with_string: (name) ->
+    if @keyCaptured
+      atom.beep()
+      return
+    cmd = 'atom-keyboard-macros:' + name
+    editor = atom.workspace.getActiveTextEditor()
+    atom.commands.dispatch(atom.views.getView(editor), cmd)
+
+  onLineInput: (text) ->
+    if @runningName_last_kbd_macro
+      @name_last_kbd_macro_with_string(text)
+    else if @runningExecute_named_macro
+      @execute_named_macro_with_string(text)
+
+    @runningName_last_kbd_macro = false
+    @runningExecute_named_macro = false
+    @oneLineInputPanel.hide()
 
   #
   # call last macro
@@ -132,6 +197,7 @@ module.exports = AtomKeyboardMacros =
     keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
     if keystroke == 'escape'
       @repeatCountPanel.hide()
+      @oneLineInputPanel.hide()
       window.removeEventListener('keydown', @escapeListener, true)
 
 
@@ -143,7 +209,7 @@ module.exports = AtomKeyboardMacros =
     @repeatCountPanel.hide()
 
   #
-  # execute macro to bottom of the buffer
+  # execute macro to bottom of the editor
   #
   execute_macro_to_bottom: ->
     this.setText("execute keyboard macro to bottom of the buffer.")
@@ -151,7 +217,7 @@ module.exports = AtomKeyboardMacros =
     this.setText("executed keyboard macro to bottom of the buffer.")
 
   #
-  # execute macro from top to bottom of the buffer
+  # execute macro from top to bottom of the editor
   #
   execute_macro_from_top_to_bottom: ->
     this.setText("execute keyboard macro from top to bottom of the buffer.")

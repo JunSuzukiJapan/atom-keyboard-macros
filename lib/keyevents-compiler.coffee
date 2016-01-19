@@ -15,7 +15,7 @@ class Compiler
     for e in keySequence
       #console.log('e: ', e)
 
-      if(e.keyIdentifier.match(/Control|Shift|Alt|Meta/)) # skip meta keys
+      if(e.keyIdentifier.match(/Control|Shift|Alt|Meta|Cmd/)) # skip meta keys
         continue
 
       if e.altKey || e.ctrlKey || e.metaKey || hasNextStroke
@@ -66,7 +66,7 @@ class Compiler
     result
 
   isNotCharKey: (e) ->
-    e.keyIdentifier.match(/Enter|Up|Down|Left|Right|PageUp|PageDown/) ||
+    e.keyIdentifier.match(/Enter|Up|Down|Left|Right|PageUp|PageDown|Escape|Backspace|Delete|Tab|Home|End/) ||
     e.keyCode < 32
 
   isAtomKeyboardMacrosCommand: (bindings) ->

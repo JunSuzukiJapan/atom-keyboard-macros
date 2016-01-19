@@ -18,6 +18,9 @@ class RepeatCountView
     @input = document.createElement('input')
     @input.type = 'number'
     @input.defaultValue = 1
+    #@input.onkeydown = (e) ->
+    #  if e.keyIdentifier == 'Enter' and self.callback
+    #    self.callback(self.input.value)
     message.appendChild(@input)
 
     button = document.createElement('button')
