@@ -23,3 +23,6 @@ class AtomKeyboardMacrosView
 
   setText: (text) ->
     @element.children[0].textContent = text
+    # redraw
+    @element.children[0].style.display = 'none'
+    @element.children[0].style.display = 'block'

@@ -11,3 +11,7 @@ keyboard macro extension for Atom.
 ```ctrl-x e```  execute macro
 
 ```ctrl-x ctrl-e```  execute macro N times
+
+```ctrl-x b```  execute macro to the end of file
+
+```ctrl-x ctrl-b``` execute macro from the beginning to the end of file

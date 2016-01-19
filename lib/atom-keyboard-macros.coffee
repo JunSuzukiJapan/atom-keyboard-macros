@@ -33,6 +33,8 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:end_kbd_macro': => @end_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:call_last_kbd_macro': => @call_last_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:repeat_last_kbd_macro': => @repeat_last_kbd_macro()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_macro_to_bottom': => @execute_macro_to_bottom()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_macro_from_top_to_bottom': => @execute_macro_from_top_to_bottom()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:toggle': => @toggle()
 
     # make event listener
@@ -69,26 +71,35 @@ module.exports = AtomKeyboardMacros =
   newHandleKeyboardEvent: (e) ->
     @keySequence.push(e)
 
+  #
+  # start recording keyborad macros
+  #
   start_kbd_macro: ->
     this.setText('start recording keyboard macros...')
     if @keyCaptured
-      #beep()
+      atom.beep()
       return
     @keySequence = []
     @keyCaptured = true
     window.addEventListener('keydown', @eventListener, true)
 
+  #
+  # stop recording keyboard macros
+  #
   end_kbd_macro: ->
     window.removeEventListener('keydown', @eventListener, true)
     @keyCaptured = false
     this.setText('end recording keyboard macros.')
     @compiledCommands = @compiler.compile(@keySequence)
 
-  # Private
+  # Util method: execute macro once
   execute_macro_once: ->
     for cmd in @compiledCommands
       cmd.execute()
 
+  #
+  # call last macro
+  #
   call_last_kbd_macro: ->
     if @keyCaptured
       atom.beep()
@@ -102,6 +113,9 @@ module.exports = AtomKeyboardMacros =
     @execute_macro_once()
     this.setText('macro executed')
 
+  #
+  # repeat last macro
+  #
   repeat_last_kbd_macro: ->
     if @keyCaptured
       atom.beep()
@@ -127,3 +141,29 @@ module.exports = AtomKeyboardMacros =
       @execute_macro_once()
     this.setText("executed macro #{count} times")
     @repeatCountPanel.hide()
+
+  #
+  # execute macro to bottom of the buffer
+  #
+  execute_macro_to_bottom: ->
+    this.setText("execute keyboard macro to bottom of the buffer.")
+    @util_execute_macro_to_bottom()
+    this.setText("executed keyboard macro to bottom of the buffer.")
+
+  #
+  # execute macro from top to bottom of the buffer
+  #
+  execute_macro_from_top_to_bottom: ->
+    this.setText("execute keyboard macro from top to bottom of the buffer.")
+    editor = atom.workspace.getActiveTextEditor()
+    if editor
+      editor.moveToTop()
+    @util_execute_macro_to_bottom()
+    this.setText("executed keyboard macro from top to bottom of the buffer.")
+
+  # Util: execute macro to bottom
+  util_execute_macro_to_bottom: ->
+    editor = atom.workspace.getActiveTextEditor()
+    if editor
+      while editor.getLastCursor().getBufferRow() < editor.getLastBufferRow()
+        @execute_macro_once()

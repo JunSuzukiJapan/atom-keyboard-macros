@@ -21,6 +21,14 @@
           'command': 'atom-keyboard-macros:repeat_last_kbd_macro'
         }
         {
+          'label': 'Repeat Macro to Bottom'
+          'command': 'atom-keyboard-macros:execute_macro_to_bottom'
+        }
+        {
+          'label': 'Repeat Macro from Top to Bottom'
+          'command': 'atom-keyboard-macros:execute_macro_from_top_to_bottom'
+        }
+        {
           'label': 'Toggle Window'
           'command': 'atom-keyboard-macros:toggle'
         }
@@ -48,6 +56,14 @@
         {
           'label': 'Repeat Macro'
           'command': 'atom-keyboard-macros:repeat_last_kbd_macro'
+        }
+        {
+          'label': 'Repeat Macro to Bottom'
+          'command': 'atom-keyboard-macros:execute_macro_to_bottom'
+        }
+        {
+          'label': 'Repeat Macro from Top to Bottom'
+          'command': 'atom-keyboard-macros:execute_macro_from_top_to_bottom'
         }
         {
           'label': 'Toggle Window'
