@@ -24,3 +24,6 @@ keyboard macro extension for Atom.
 
 - atom-keyboard-macros:execute_named_macro
     Execute a named keyboard macro(see atom-keyboard-macros:name_last_kbd_macro).
+
+- atom-keyboard-macros:all_macros_to_new_text_editor
+    Open new text editor, and all named macro definition paste to it.
