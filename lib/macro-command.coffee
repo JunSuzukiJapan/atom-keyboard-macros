@@ -24,14 +24,17 @@ class DispatchCommand
   @viewInitialized: false
 
   constructor: (keystroke) ->
-    bindings = atom.keymaps.findKeyBindings({keystrokes: keystroke})
+    editor = atom.workspace.getActiveTextEditor()
+    view = atom.views.getView(editor)
+    bindings = atom.keymaps.findKeyBindings({keystrokes: keystroke, target: view})
     if bindings.length == 0
       @command_name = ''
       return
     else
       @command_name = bindings.command
       if !@command_name
-        bind = bindings[bindings.length - 1]
+        #console.log('bindings', bindings)
+        bind = bindings[0]
         @command_name = bind.command
     #console.log('@command_name', @command_name)
 

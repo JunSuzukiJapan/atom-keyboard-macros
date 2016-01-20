@@ -48,7 +48,7 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:toggle': => @toggle()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:name_last_kbd_macro': => @name_last_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_named_macro': => @execute_named_macro()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:last_macro_to_string': => @last_macro_to_string()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:all_macros_to_new_text_editor': => @all_macros_to_new_text_editor()
 
     # make event listener
     @eventListener = @newHandleKeyboardEvent.bind(this)
@@ -120,15 +120,38 @@ module.exports = AtomKeyboardMacros =
   #
   # Save to file
   #
+  table: {}  # named macro table
+
+  addNamedMacroTable: (name, commands) ->
+    @table[name] = commands
+    #console.log('table', @table)
+
   macro_to_string: (cmds) ->
     result = ''
-    tabs = '  '
+    tabs = '    '
     DispatchCommand.resetForToString()
 
     for cmd in cmds
       result += cmd.toString(tabs)
+    #console.log('result ', result)
     result
 
+  allMacrosToString: ->
+    str = '\n'
+    for name, cmds of @table
+      str += '  ' + name + ': ->\n'
+      str += @macro_to_string(cmds) + '\n'
+    #console.log('macros \n', str)
+    str
+
+  all_macros_to_new_text_editor: ->
+    self = this
+    promiss = atom.workspace.open()
+    promiss.then (editor) ->
+      #console.log('editor', editor)
+      editor.insertText(self.allMacrosToString())
+
+  ###
   last_macro_to_string: ->
     if @keyCaptured
       atom.beep()
@@ -140,8 +163,9 @@ module.exports = AtomKeyboardMacros =
       console.log('macro: ', result)
     else
       atom.beep()
+  ###
 
-  #
+
   # name last keyboard macro
   #
   name_last_kbd_macro: ->
@@ -157,6 +181,7 @@ module.exports = AtomKeyboardMacros =
 
     if @compiledCommands and @compiledCommands.length > 0
       self = this
+      @addNamedMacroTable(name, @compiledCommands)
       atom.commands.add 'atom-workspace', ('atom-keyboard-macros.user:' + name), ->
         self.execute_macro_commands self.compiledCommands
 
