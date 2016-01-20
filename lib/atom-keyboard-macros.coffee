@@ -47,6 +47,7 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:toggle': => @toggle()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:name_last_kbd_macro': => @name_last_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_named_macro': => @execute_named_macro()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:last_macro_to_string': => @last_macro_to_string()
 
     # make event listener
     @eventListener = @newHandleKeyboardEvent.bind(this)
@@ -105,13 +106,36 @@ module.exports = AtomKeyboardMacros =
     this.setText('end recording keyboard macros.')
     @compiledCommands = @compiler.compile(@keySequence)
 
+  #
   # Util method: execute macro once
+  #
   execute_macro_once: ->
     @execute_macro_commands @compiledCommands
 
   execute_macro_commands: (cmds) ->
     for cmd in cmds
       cmd.execute()
+
+  #
+  # Save to file
+  #
+  macro_to_string: (cmds) ->
+    result = ''
+    tabs = '  '
+    for cmd in cmds
+      result += cmd.toString(tabs)
+    result
+    console.log('macro: ', result)
+
+  last_macro_to_string: ->
+    if @keyCaptured
+      atom.beep()
+      return
+
+    if @compiledCommands and @compiledCommands.length > 0
+      @macro_to_string(@compiledCommands)
+    else
+      atom.beep()
 
   #
   # name last keyboard macro

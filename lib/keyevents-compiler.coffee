@@ -28,7 +28,6 @@ class Compiler
         else
           keystroke = keystroke + ' ' + stroke
 
-        #console.log('keystroke: ', keystroke)
         bindings = atom.keymaps.findKeyBindings({keystrokes: keystroke})
         if bindings.length == 0 || @notTextEditorCommand(bindings)
           isTextMode = false
@@ -42,6 +41,15 @@ class Compiler
           keystroke = ''
           if not @isAtomKeyboardMacrosCommand(bindings)
             result.push(new KeydownCommand([e]))
+
+            #console.log('bindings ', bindings)
+            #bind = bindings[bindings.length - 1]
+            #if !bind
+            #  command = bindings.command
+            #else
+            #  command = bind.command
+            #console.log('command', command)
+            #result.push(new DispatchCommand(command))
 
       else if @isNotCharKey(e)
         if isTextMode
