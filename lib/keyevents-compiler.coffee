@@ -42,15 +42,6 @@ class Compiler
           if not @isAtomKeyboardMacrosCommand(bindings)
             result.push(new KeydownCommand([e]))
 
-            #console.log('bindings ', bindings)
-            #bind = bindings[bindings.length - 1]
-            #if !bind
-            #  command = bindings.command
-            #else
-            #  command = bind.command
-            #console.log('command', command)
-            #result.push(new DispatchCommand(command))
-
       else if @isNotCharKey(e)
         if isTextMode
           isTextMode = false

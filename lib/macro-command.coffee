@@ -16,19 +16,9 @@ class InputTextCommand extends MacroCommand
     result = ''
     for e in @events
       s = atom.keymaps.keystrokeForKeyboardEvent(e)
-      console.log('e: ', e, s)
+      #console.log('e: ', e, s)
       result += tabs + 'atom.keymaps.simulateTextInput(' + e + ')\n'
     result
-
-###
-class DispatchCommand extends MacroCommand
-  constructor: (@command_name) ->
-
-  execute: ->
-    editor = atom.workspace.getActiveTextEditor()
-    console.log('dispatch command:', @command_name, ', editor', editor)
-    atom.commands.dispatch(editor, @command_name)
-###
 
 class KeydownCommand extends MacroCommand
   constructor: (@events) ->
@@ -55,4 +45,3 @@ module.exports =
     MacroCommand: MacroCommand
     InputTextCommand: InputTextCommand
     KeydownCommand: KeydownCommand
-    #DispatchCommand: DispatchCommand
