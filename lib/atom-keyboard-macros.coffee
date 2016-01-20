@@ -4,6 +4,7 @@ OneLineInputView = require './one-line-input-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
 Compiler = require './keyevents-compiler'
+{DispatchCommand} = require './macro-command'
 
 module.exports = AtomKeyboardMacros =
   atomKeyboardMacrosView: null
@@ -122,6 +123,8 @@ module.exports = AtomKeyboardMacros =
   macro_to_string: (cmds) ->
     result = ''
     tabs = '  '
+    DispatchCommand.resetForToString()
+
     for cmd in cmds
       result += cmd.toString(tabs)
     result

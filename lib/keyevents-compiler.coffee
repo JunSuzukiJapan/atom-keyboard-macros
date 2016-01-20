@@ -1,7 +1,7 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
-{InputTextCommand, KeydownCommand} = require './macro-command'
+{InputTextCommand, KeydownCommand, DispatchCommand} = require './macro-command'
 
 module.exports =
 class Compiler
@@ -40,7 +40,8 @@ class Compiler
           hasNextStroke = false
           keystroke = ''
           if not @isAtomKeyboardMacrosCommand(bindings)
-            result.push(new KeydownCommand([e]))
+            #result.push(new KeydownCommand([e]))
+            result.push(new DispatchCommand(stroke))
 
       else if @isNotCharKey(e)
         if isTextMode

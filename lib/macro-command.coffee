@@ -20,6 +20,40 @@ class InputTextCommand extends MacroCommand
       result += tabs + 'atom.keymaps.simulateTextInput(' + e + ')\n'
     result
 
+class DispatchCommand
+  @viewInitialized: false
+
+  constructor: (keystroke) ->
+    bindings = atom.keymaps.findKeyBindings({keystrokes: keystroke})
+    if bindings.length == 0
+      @command_name = ''
+      return
+    else
+      @command_name = bindings.command
+      if !@command_name
+        bind = bindings[bindings.length - 1]
+        @command_name = bind.command
+    #console.log('@command_name', @command_name)
+
+  execute: ->
+    editor = atom.workspace.getActiveTextEditor()
+    if editor
+      view = atom.views.getView(editor)
+      atom.commands.dispatch(view, @command_name)
+
+  @resetForToString: ->
+    DispatchCommand.viewInitialized = false
+
+  toString: (tabs) ->
+    result = ''
+    if !DispatchCommand.viewInitialized
+      result += tabs + 'editor = atom.workspace.getActiveTextEditor()\n'
+      result += tabs + 'view = atom.views.getView(editor)\n'
+      DispatchCommand.viewInitialized = true
+    result += tabs + 'atom.commands.dispatch(view, "' + @command_name + '")\n'
+    result
+
+
 class KeydownCommand extends MacroCommand
   constructor: (@events) ->
 
@@ -28,6 +62,8 @@ class KeydownCommand extends MacroCommand
       atom.keymaps.handleKeyboardEvent(e)
 
   toString: (tabs) ->
+    return '\n'
+    ###
     result = ''
     for e in @events
       k = keydownEvent(e.keyIdentifier, {
@@ -38,10 +74,12 @@ class KeydownCommand extends MacroCommand
         })
       k.which = e.which
       k.keyCode = e.keyCode
-      result += tabs + 'atom.keymaps.handleKeyboardEvent(' + e + ')\n'
+      result += tabs + 'atom.keymaps.handleKeyboardEvent(' + k + ')\n'
     result
+    ###
 
 module.exports =
     MacroCommand: MacroCommand
     InputTextCommand: InputTextCommand
     KeydownCommand: KeydownCommand
+    DispatchCommand: DispatchCommand
