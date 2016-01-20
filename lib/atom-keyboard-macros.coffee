@@ -128,7 +128,6 @@ module.exports = AtomKeyboardMacros =
     for cmd in cmds
       result += cmd.toString(tabs)
     result
-    console.log('macro: ', result)
 
   last_macro_to_string: ->
     if @keyCaptured
@@ -136,7 +135,9 @@ module.exports = AtomKeyboardMacros =
       return
 
     if @compiledCommands and @compiledCommands.length > 0
-      @macro_to_string(@compiledCommands)
+      result = 'atom-keyboard-macros.user.' + 'methodName' + ': ->\n'
+      result += @macro_to_string(@compiledCommands)
+      console.log('macro: ', result)
     else
       atom.beep()
 
@@ -156,7 +157,7 @@ module.exports = AtomKeyboardMacros =
 
     if @compiledCommands and @compiledCommands.length > 0
       self = this
-      atom.commands.add 'atom-workspace', ('atom-keyboard-macros:' + name), ->
+      atom.commands.add 'atom-workspace', ('atom-keyboard-macros.user:' + name), ->
         self.execute_macro_commands self.compiledCommands
 
     else
@@ -175,7 +176,7 @@ module.exports = AtomKeyboardMacros =
     if @keyCaptured
       atom.beep()
       return
-    cmd = 'atom-keyboard-macros:' + name
+    cmd = 'atom-keyboard-macros.user:' + name
     editor = atom.workspace.getActiveTextEditor()
     atom.commands.dispatch(atom.views.getView(editor), cmd)
 
