@@ -4,7 +4,8 @@ OneLineInputView = require './one-line-input-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
 Compiler = require './keyevents-compiler'
-{DispatchCommand} = require './macro-command'
+{MacroCommand, DispatchCommand} = require './macro-command'
+fs = require 'fs'
 
 module.exports = AtomKeyboardMacros =
   atomKeyboardMacrosView: null
@@ -25,7 +26,13 @@ module.exports = AtomKeyboardMacros =
   runningName_last_kbd_macro: false
   runningExecute_named_macro: false
 
+  quick_save_dirname: null
+  quick_save_filename: null
+
   activate: (state) ->
+    @quick_save_dirname = atom.packages.resolvePackagePath('atom-keyboard-macros') + '/__quick/'
+    @quick_save_filename = @quick_save_dirname + 'macros.coffee'
+
     @atomKeyboardMacrosView = new AtomKeyboardMacrosView(state.atomKeyboardMacrosViewState)
     @messagePanel = atom.workspace.addBottomPanel(item: @atomKeyboardMacrosView.getElement(), visible: false)
 
@@ -48,14 +55,15 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:toggle': => @toggle()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:name_last_kbd_macro': => @name_last_kbd_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_named_macro': => @execute_named_macro()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:quick_save': => @quick_save()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:quick_load': => @quick_load()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:save': => @save()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:load': => @load()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:all_macros_to_new_text_editor': => @all_macros_to_new_text_editor()
 
     # make event listener
     @eventListener = @newHandleKeyboardEvent.bind(this)
     @escapeListener = @onEscapeKey.bind(this)
-
-    @repeatCountView.setCallback(@onGetRepeatCount.bind(this))
-    @oneLineInputView.setCallback(@onLineInput.bind(this))
 
     @keyCaptured = false
     @compiler = new Compiler()
@@ -129,7 +137,7 @@ module.exports = AtomKeyboardMacros =
   macro_to_string: (cmds) ->
     result = ''
     tabs = '    '
-    DispatchCommand.resetForToString()
+    MacroCommand.resetForToString()
 
     for cmd in cmds
       result += cmd.toString(tabs)
@@ -148,7 +156,6 @@ module.exports = AtomKeyboardMacros =
     self = this
     promiss = atom.workspace.open()
     promiss.then (editor) ->
-      #console.log('editor', editor)
       editor.insertText(self.allMacrosToString())
 
   ###
@@ -166,6 +173,76 @@ module.exports = AtomKeyboardMacros =
   ###
 
 
+
+  #
+  # file Util
+  #
+  ask_filename: (callback) ->
+    @oneLineInputPanel.show()
+    @oneLineInputView.input.focus()
+    @oneLineInputView.setCallback (e) ->
+      console.log('callback')
+      callback e
+
+  #
+  # save
+  #
+
+  # save as ...
+  save: ->
+    _self = this
+    @ask_filename (name) ->
+      console.log('save: ', name)
+      _self.save_as name
+      _self.oneLineInputPanel.hide()
+
+  save_as: (filename) ->
+    str = ''
+    for name, cmds of @table
+      str += '>' + name + '\n'
+      for cmd in cmds
+        str += cmd.toSaveString()
+    #console.log('save to: ', filename, '\n  ', str)
+    self = this
+    fs.exists @quick_save_dirname, (exists) ->
+      if !exists
+        console.log('savedir ', self.quick_save_dirname)
+        fs.mkdirSync self.quick_save_dirname
+      fs.writeFile filename, str, (err) ->
+        if err
+          console.log(err)
+
+  # quick_save
+  quick_save: ->
+    @save_as @quick_save_filename
+
+  #
+  # load
+  #
+
+  # load as ...
+  load: ->
+    _self = this
+    @ask_filename (name) ->
+      _self.load_with_name name
+
+  load_with_name: (name) ->
+    self = this
+    fs.readFile name, 'utf8', (err, text) ->
+      if err
+        console.error err
+      else
+        macros = MacroCommand.loadStringAsMacroCommands text
+        for name, cmds of macros
+          self.addNamedMacroTable(name, cmds)
+          atom.commands.add 'atom-workspace', ('atom-keyboard-macros.user:' + name), ->
+            self.execute_macro_commands cmds
+
+  # quick_load
+  quick_load: ->
+    @load_with_name @quick_save_filename
+
+  #
   # name last keyboard macro
   #
   name_last_kbd_macro: ->
@@ -173,6 +250,11 @@ module.exports = AtomKeyboardMacros =
     @oneLineInputPanel.show()
     @oneLineInputView.input.focus()
     window.addEventListener('keydown', @escapeListener, true)
+    self = this
+    @oneLineInputView.setCallback (text) ->
+      self.name_last_kbd_macro_with_string(text)
+      self.oneLineInputPanel.hide()
+
 
   name_last_kbd_macro_with_string: (name) ->
     if @keyCaptured
@@ -196,6 +278,9 @@ module.exports = AtomKeyboardMacros =
     @oneLineInputPanel.show()
     @oneLineInputView.input.focus()
     window.addEventListener('keydown', @escapeListener, true)
+    @oneLineInputView.setCallback (text) ->
+      execute_named_macro_with_string(text)
+      self.oneLineInputPanel.hide()
 
   execute_named_macro_with_string: (name) ->
     if @keyCaptured
@@ -205,6 +290,7 @@ module.exports = AtomKeyboardMacros =
     editor = atom.workspace.getActiveTextEditor()
     atom.commands.dispatch(atom.views.getView(editor), cmd)
 
+  ###
   onLineInput: (text) ->
     if @runningName_last_kbd_macro
       @name_last_kbd_macro_with_string(text)
@@ -214,6 +300,7 @@ module.exports = AtomKeyboardMacros =
     @runningName_last_kbd_macro = false
     @runningExecute_named_macro = false
     @oneLineInputPanel.hide()
+  ###
 
   #
   # call last macro
@@ -245,6 +332,7 @@ module.exports = AtomKeyboardMacros =
     @repeatCountPanel.show()
     @repeatCountView.input.focus()
     window.addEventListener('keydown', @escapeListener, true)
+    @repeatCountView.setCallback onGetRepeatCount
 
   onEscapeKey: (e) ->
     keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)

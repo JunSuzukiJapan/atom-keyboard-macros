@@ -40,7 +40,6 @@ class Compiler
           hasNextStroke = false
           keystroke = ''
           if not @isAtomKeyboardMacrosCommand(bindings)
-            #result.push(new KeydownCommand([e]))
             result.push(new DispatchCommand(stroke))
 
       else if @isNotCharKey(e)
