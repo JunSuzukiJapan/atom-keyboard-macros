@@ -30,7 +30,7 @@ class MacroCommand
         return null
 
       name = line.substring(1)
-      console.log('name: ', name)
+      #console.log('name: ', name)
 
       cmds = []
 
@@ -47,7 +47,8 @@ class MacroCommand
               if line.length < 2
                 continue
               for i in [1..line.length-1]
-                cmds.push(new InputTextCommand(line[i]))
+                event = MacroCommand.keydownEventFromString(line[i])
+                cmds.push(new InputTextCommand(event))
 
           when 'D'
             line = lines[index++]
@@ -60,8 +61,9 @@ class MacroCommand
 
           when 'K'
             while (index < lines.length) and (lines[index][0] == ':')
-              s = lines[index].substring(1)
-              event = @keydownEventFromString(s)
+              line = lines[index++]
+              s = line.substring(1)
+              event = MacroCommand.keydownEventFromString(s)
               cmds.push(new KeydownCommand(event))
 
           else
@@ -73,7 +75,7 @@ class MacroCommand
 
     result
 
-  keydownEventFromString: (keystroke) ->
+  @keydownEventFromString: (keystroke) ->
     hasCtrl = keystroke.indexOf('ctrl-') > -1
     hasAlt = keystroke.indexOf('alt-') > -1
     hasShift = keystroke.indexOf('shift-') > -1
@@ -83,11 +85,12 @@ class MacroCommand
     s = s.replace('shift-', '')
     key = s.replace('cmd-', '')
     event = keydownEvent(key, {
-        ctrl: hasCtrl
-        alt: hasAlt
-        shift: hasShift
-        cmd: hasCmd
-      })
+      ctrl: hasCtrl
+      alt: hasAlt
+      shift: hasShift
+      cmd: hasCmd
+    })
+    console.log('event', event)
     event
 
 
@@ -179,7 +182,7 @@ class KeydownCommand extends MacroCommand
   toSaveString: ->
     result = '*K\n'
     for e in @events
-      result += keystrokeForKeyboardEvent(e) + '\n'
+      result += ':' + keystrokeForKeyboardEvent(e) + '\n'
     result
 
 module.exports =

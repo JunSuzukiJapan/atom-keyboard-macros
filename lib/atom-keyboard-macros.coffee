@@ -131,8 +131,11 @@ module.exports = AtomKeyboardMacros =
   table: {}  # named macro table
 
   addNamedMacroTable: (name, commands) ->
+    self = this
     @table[name] = commands
     #console.log('table', @table)
+    atom.commands.add 'atom-workspace', ('atom-keyboard-macros.user:' + name), ->
+      self.execute_macro_commands commands
 
   macro_to_string: (cmds) ->
     result = ''
@@ -234,9 +237,8 @@ module.exports = AtomKeyboardMacros =
       else
         macros = MacroCommand.loadStringAsMacroCommands text
         for name, cmds of macros
+          #console.log('name: ', name, ', cmds: ', cmds)
           self.addNamedMacroTable(name, cmds)
-          atom.commands.add 'atom-workspace', ('atom-keyboard-macros.user:' + name), ->
-            self.execute_macro_commands cmds
 
   # quick_load
   quick_load: ->
@@ -262,11 +264,7 @@ module.exports = AtomKeyboardMacros =
       return
 
     if @compiledCommands and @compiledCommands.length > 0
-      self = this
       @addNamedMacroTable(name, @compiledCommands)
-      atom.commands.add 'atom-workspace', ('atom-keyboard-macros.user:' + name), ->
-        self.execute_macro_commands self.compiledCommands
-
     else
       atom.beep()
 
