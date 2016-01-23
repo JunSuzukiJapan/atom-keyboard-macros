@@ -57,8 +57,8 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_named_macro': => @execute_named_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:quick_save': => @quick_save()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:quick_load': => @quick_load()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:save': => @save()
-    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:load': => @load()
+    #@subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:save': => @save()
+    #@subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:load': => @load()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:all_macros_to_new_text_editor': => @all_macros_to_new_text_editor()
 
     # make event listener
@@ -133,7 +133,12 @@ module.exports = AtomKeyboardMacros =
   addNamedMacroTable: (name, commands) ->
     self = this
     @table[name] = commands
-    #console.log('table', @table)
+
+    # remove old command if exists
+    prevCommand = atom.commands.selectorBasedListenersByCommandName['atom-keyboard-macros.user:' + name]
+    if prevCommand
+      atom.commands.selectorBasedListenersByCommandName['atom-keyboard-macros.user:' + name] = null
+    # add new command
     atom.commands.add 'atom-workspace', ('atom-keyboard-macros.user:' + name), ->
       self.execute_macro_commands commands
 

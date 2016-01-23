@@ -90,7 +90,6 @@ class MacroCommand
       shift: hasShift
       cmd: hasCmd
     })
-    console.log('event', event)
     event
 
 

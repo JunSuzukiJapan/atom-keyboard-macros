@@ -32,6 +32,14 @@
           'label': 'Toggle Window'
           'command': 'atom-keyboard-macros:toggle'
         }
+        {
+          'label': 'Quick Load'
+          'command': 'atom-keyboard-macros:quick_load'
+        }
+        {
+          'label': 'Quick Save'
+          'command': 'atom-keyboard-macros:quick_save'
+        }
       ]
     }
   ]
@@ -68,6 +76,14 @@
         {
           'label': 'Toggle Window'
           'command': 'atom-keyboard-macros:toggle'
+        }
+        {
+          'label': 'Quick Load'
+          'command': 'atom-keyboard-macros:quick_load'
+        }
+        {
+          'label': 'Quick Save'
+          'command': 'atom-keyboard-macros:quick_save'
         }
       ]
     ]
