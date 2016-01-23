@@ -78,6 +78,7 @@ module.exports = AtomKeyboardMacros =
     @messagePanel.destroy()
     @subscriptions.dispose()
     @atomKeyboardMacrosView.destroy()
+    window.addEventListener('keydown', @escapeListener, true)
     window.removeEventListener('keydown', @eventListener, true)
 
   serialize: ->
