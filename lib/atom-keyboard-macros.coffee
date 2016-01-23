@@ -19,6 +19,7 @@ module.exports = AtomKeyboardMacros =
   keyCaptured: false
   eventListener: null
   escapeListener: null
+  escapeKeyPressed: false
   keySequence: []
   compiler: null
   compiledCommands: null
@@ -78,7 +79,7 @@ module.exports = AtomKeyboardMacros =
     @messagePanel.destroy()
     @subscriptions.dispose()
     @atomKeyboardMacrosView.destroy()
-    window.addEventListener('keydown', @escapeListener, true)
+    window.removeEventListener('keydown', @escapeListener, true)
     window.removeEventListener('keydown', @eventListener, true)
 
   serialize: ->
@@ -352,6 +353,7 @@ module.exports = AtomKeyboardMacros =
   onEscapeKey: (e) ->
     keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
     if keystroke == 'escape'
+      @escapeKeyPressed = true
       @repeatCountPanel.hide()
       @oneLineInputPanel.hide()
       window.removeEventListener('keydown', @escapeListener, true)
@@ -387,5 +389,10 @@ module.exports = AtomKeyboardMacros =
   util_execute_macro_to_bottom: ->
     editor = atom.workspace.getActiveTextEditor()
     if editor
+      window.addEventListener('keydown', @escapeListener, true)
+      @escaescapeKeyPressed = false
       while editor.getLastCursor().getBufferRow() < editor.getLastBufferRow()
+        if @escapeKeyPressed
+          break
         @execute_macro_once()
+      window.removeEventListener('keydown', @escapeListener, true)
