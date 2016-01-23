@@ -71,10 +71,12 @@ module.exports = AtomKeyboardMacros =
     @compiler = new Compiler()
 
   deactivate: ->
+    @oneLineInputPanel.destroy()
+    @oneLineInputView.destroy()
     @repeatCountPanel.destroy()
+    @repeatCountView.destroy()
     @messagePanel.destroy()
     @subscriptions.dispose()
-    @repeatCountView.destroy()
     @atomKeyboardMacrosView.destroy()
     window.removeEventListener('keydown', @eventListener, true)
 
@@ -219,14 +221,14 @@ module.exports = AtomKeyboardMacros =
     self = this
     fs.writeFile filename, str, (err) ->
       if err
-        console.log(err)
+        console.error (err)
 
   # quick_save
   quick_save: ->
     ___self = this
     fs.exists @quick_save_dirname, (exists) ->
       if !exists
-        console.log('savedir ', ___self.quick_save_dirname)
+        #console.log('savedir ', ___self.quick_save_dirname)
         fs.mkdirSync ___self.quick_save_dirname
       ___self.save_as ___self.quick_save_filename
 
