@@ -40,6 +40,14 @@
           'label': 'Quick Save'
           'command': 'atom-keyboard-macros:quick_save'
         }
+        {
+          'label': 'Load...'
+          'command': 'atom-keyboard-macros:load'
+        }
+        {
+          'label': 'Save as...'
+          'command': 'atom-keyboard-macros:save'
+        }
       ]
     }
   ]
@@ -84,6 +92,14 @@
         {
           'label': 'Quick Save'
           'command': 'atom-keyboard-macros:quick_save'
+        }
+        {
+          'label': 'Load...'
+          'command': 'atom-keyboard-macros:load'
+        }
+        {
+          'label': 'Save as...'
+          'command': 'atom-keyboard-macros:save'
         }
       ]
     ]

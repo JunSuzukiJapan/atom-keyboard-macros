@@ -28,10 +28,12 @@ module.exports = AtomKeyboardMacros =
 
   quick_save_dirname: null
   quick_save_filename: null
+  macro_dirname: null
 
   activate: (state) ->
     @quick_save_dirname = atom.packages.resolvePackagePath('atom-keyboard-macros') + '/__quick/'
-    @quick_save_filename = @quick_save_dirname + 'macros.coffee'
+    @quick_save_filename = @quick_save_dirname + 'macros.atmkm'
+    @macro_dirname = atom.packages.resolvePackagePath('atom-keyboard-macros') + '/macros/'
 
     @atomKeyboardMacrosView = new AtomKeyboardMacrosView(state.atomKeyboardMacrosViewState)
     @messagePanel = atom.workspace.addBottomPanel(item: @atomKeyboardMacrosView.getElement(), visible: false)
@@ -57,8 +59,8 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:execute_named_macro': => @execute_named_macro()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:quick_save': => @quick_save()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:quick_load': => @quick_load()
-    #@subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:save': => @save()
-    #@subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:load': => @load()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:save': => @save()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:load': => @load()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:all_macros_to_new_text_editor': => @all_macros_to_new_text_editor()
 
     # make event listener
@@ -188,8 +190,8 @@ module.exports = AtomKeyboardMacros =
   ask_filename: (callback) ->
     @oneLineInputPanel.show()
     @oneLineInputView.input.focus()
+    window.addEventListener('keydown', @escapeListener, true)
     @oneLineInputView.setCallback (e) ->
-      console.log('callback')
       callback e
 
   #
@@ -199,10 +201,14 @@ module.exports = AtomKeyboardMacros =
   # save as ...
   save: ->
     _self = this
-    @ask_filename (name) ->
-      console.log('save: ', name)
-      _self.save_as name
-      _self.oneLineInputPanel.hide()
+    fs.exists @macro_dirname, (exists) ->
+      if !exists
+        fs.mkdirSync _self.macro_dirname
+      _self.ask_filename (name) ->
+        fullpath = _self.macro_dirname + name
+        #console.log('save: ', fullpath)
+        _self.save_as fullpath
+        _self.oneLineInputPanel.hide()
 
   save_as: (filename) ->
     str = ''
@@ -210,19 +216,19 @@ module.exports = AtomKeyboardMacros =
       str += '>' + name + '\n'
       for cmd in cmds
         str += cmd.toSaveString()
-    #console.log('save to: ', filename, '\n  ', str)
     self = this
-    fs.exists @quick_save_dirname, (exists) ->
-      if !exists
-        console.log('savedir ', self.quick_save_dirname)
-        fs.mkdirSync self.quick_save_dirname
-      fs.writeFile filename, str, (err) ->
-        if err
-          console.log(err)
+    fs.writeFile filename, str, (err) ->
+      if err
+        console.log(err)
 
   # quick_save
   quick_save: ->
-    @save_as @quick_save_filename
+    ___self = this
+    fs.exists @quick_save_dirname, (exists) ->
+      if !exists
+        console.log('savedir ', ___self.quick_save_dirname)
+        fs.mkdirSync ___self.quick_save_dirname
+      ___self.save_as ___self.quick_save_filename
 
   #
   # load
@@ -232,7 +238,10 @@ module.exports = AtomKeyboardMacros =
   load: ->
     _self = this
     @ask_filename (name) ->
-      _self.load_with_name name
+      fullpath = _self.macro_dirname + name
+      #console.log('load: ', fullpath)
+      _self.load_with_name fullpath
+      _self.oneLineInputPanel.hide()
 
   load_with_name: (name) ->
     self = this
