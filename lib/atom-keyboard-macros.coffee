@@ -348,7 +348,9 @@ module.exports = AtomKeyboardMacros =
     @repeatCountPanel.show()
     @repeatCountView.input.focus()
     window.addEventListener('keydown', @escapeListener, true)
-    @repeatCountView.setCallback onGetRepeatCount
+    self = this
+    @repeatCountView.setCallback (count) ->
+      self.onGetRepeatCount(count)
 
   onEscapeKey: (e) ->
     keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
@@ -360,11 +362,11 @@ module.exports = AtomKeyboardMacros =
 
 
   onGetRepeatCount: (count) ->
-    for i in [1..count]
-      this.setText("execute keyboard macro #{i}")
-      @execute_macro_once()
-    this.setText("executed macro #{count} times")
     @repeatCountPanel.hide()
+    for i in [1..count]
+      @setText("execute keyboard macro #{i}")
+      @execute_macro_once()
+    @setText("executed macro #{count} times")
 
   #
   # execute macro to bottom of the editor
