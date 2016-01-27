@@ -4,6 +4,7 @@ AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 
 class MacroCommand
   @viewInitialized: false
+  @findViewInitialized: false
 
   @resetForToString: ->
     MacroCommand.viewInitialized = false
@@ -17,7 +18,7 @@ class MacroCommand
   # override this method
   toSaveString: ->
 
-  @loadStringAsMacroCommands: (text) ->
+  @loadStringAsMacroCommands: (text, findAndReplace) ->
     result = {}
     lines = text.split('\n')
     index = 0
@@ -66,6 +67,20 @@ class MacroCommand
               event = MacroCommand.keydownEventFromString(s)
               cmds.push(new KeydownCommand(event))
 
+          when ':'
+            cmdName = line.substring(2)
+            switch cmdName
+              when 'RPLALL'
+                console.log(findAndReplace)
+                line = lines[index++]
+                editText = line.substring(3)
+                line = lines[index++]
+                replaceText = line.substring(3)
+                cmds.push(new ReplaceAllCommand(findAndReplace, editText, replaceText))
+
+
+
+
           else
             console.error 'illegal format loading macro commands.'
             return null
@@ -91,6 +106,35 @@ class MacroCommand
       cmd: hasCmd
     })
     event
+
+  @findViewInitialize: ->
+    result += tabs + "editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())\n"
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:toggle') # wake up if not active\n"
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:toggle') # hide\n"
+    result += tabs + "panels = atom.workspace.getBottomPanels()\n"
+    result += tabs + "for panel in panels\n"
+    result += tabs + "  item = panel.item\n"
+    result += tabs + "  name = item?.__proto__?.constructor?.name\n"
+    result += tabs + "  if name == 'FindView'\n"
+    result += tabs + "    @findNext = item.findNext\n"
+    result += tabs + "    @findPrevious = item.findPrevious\n"
+    result += tabs + "    @findNextSelected = item.findNextSelected\n"
+    result += tabs + "    @findPreviousSelected = item.findPreviousSelected\n"
+    result += tabs + "    @setSelectionAsFindPattern = item.setSelectionAsFindPattern\n"
+    result += tabs + "    @replacePrevious = item.replacePrevious\n"
+    result += tabs + "    @replaceNext = item.replaceNext\n"
+    result += tabs + "    @replaceAll = item.replaceAll\n"
+    result += tabs + "    @findEditor = item.findEditor\n"
+    result += tabs + "    @replaceEditor = item.replaceEditor\n"
+    result += tabs + "    @replaceAllButton = item.replaceAllButton\n"
+    result += tabs + "    @replaceNextButton = item.replaceNextButton\n"
+    result += tabs + "    @nextButton = item.nextButton\n"
+    result += tabs + "    @regexOptionButton = item.regexOptionButton\n"
+    result += tabs + "    @caseOptionButton = item.caseOptionButton\n"
+    result += tabs + "    @selectionOptionButton = item.selectionOptionButton\n"
+    result += tabs + "    @wholeWordOptionButton = item.wholeWordOptionButton\n"
+
+    MacroCommand.findViewInitialized = true
 
 
 class InputTextCommand extends MacroCommand
@@ -160,7 +204,8 @@ class KeydownCommand extends MacroCommand
     if !MacroCommand.viewInitialized
       result += tabs + 'editor = atom.workspace.getActiveTextEditor()\n'
       result += tabs + 'view = atom.views.getView(editor)\n'
-      DispatchCommand.viewInitialized = true
+      MacroCommand.viewInitialized = true
+
     for e in @events
       result += tabs + "event = document.createEvent('KeyboardEvent')\n"
       result += tabs + "bubbles = true\n"
@@ -177,6 +222,7 @@ class KeydownCommand extends MacroCommand
       result += tabs + "Object.defineProperty(event, 'keyCode', get: -> keyCode)\n"
       result += tabs + "Object.defineProperty(event, 'which', get: -> keyCode)\n"
       result += tabs + "atom.keymaps.handleKeyboardEvent(event)\n"
+    result
 
   toSaveString: ->
     result = '*K\n'
@@ -184,8 +230,117 @@ class KeydownCommand extends MacroCommand
       result += ':' + keystrokeForKeyboardEvent(e) + '\n'
     result
 
+class FindNextCommand extends MacroCommand
+  constructor: (@findAndReplace, @text, @options) ->
+
+  execute: ->
+    @findAndReplace.setFindText(@text)
+    @findAndReplace.findNext(@options)
+
+  toString: (tabs) ->
+
+  toSaveString: ->
+
+class FindPreviousCommand extends MacroCommand
+  constructor: (@findAndReplace, @text, @options) ->
+
+  execute: ->
+    @findAndReplace.setText(@text)
+    @findAndReplace.findPrevious(@options)
+
+  toString: (tabs) ->
+
+  toSaveString: ->
+
+class FindNextSelectedCommand extends MacroCommand
+  constructor: (@findAndReplace, @text) ->
+
+  execute: ->
+    @findAndReplace.setText(@text)
+    @findAndReplace.findNextSecected()
+
+  toString: (tabs) ->
+
+  toSaveString: ->
+
+class FindPreviousSelectedCommand extends MacroCommand
+  constructor: (@findAndReplace, @text) ->
+
+  execute: ->
+    @findAndReplace.setFindText(@text)
+    @findAndReplace.findPreviousSelected()
+
+  toString: (tabs) ->
+
+  toSaveString: ->
+
+class SetSelectionAsFindPatternCommand extends MacroCommand
+  constructor: (@findAndReplace)->
+
+  execute: ->
+    @findAndReplace.setSelectionAsFindPattern()
+
+  toString: (tabs) ->
+
+  toSaveString: ->
+
+class ReplacePreviousCommand extends MacroCommand
+  constructor: (@findAndReplace, @findText, @replaceText) ->
+
+  execute: ->
+    @findAndReplace.setFindText(@findText)
+    @findAndReplace.setReplaceText(@replaceText)
+    @findAndReplace.replacePrevious()
+
+  toString: (tabs) ->
+
+  toSaveString: ->
+
+class ReplaceNextCommand extends MacroCommand
+  constructor: (@findAndReplace, @findText, @replaceText) ->
+
+  execute: ->
+    @findAndReplace.setFindText(@findText)
+    @findAndReplace.setReplaceText(@replaceText)
+    @findAndReplace.replaceNext()
+
+  toString: (tabs) ->
+
+  toSaveString: ->
+
+class ReplaceAllCommand extends MacroCommand
+  constructor: (@findAndReplace, @findText, @replaceText) ->
+
+  execute: ->
+    @findAndReplace.setFindText(@findText)
+    @findAndReplace.setReplaceText(@replaceText)
+    @findAndReplace.replaceAll()
+
+  toString: (tabs) ->
+    result = ''
+    if !MacroCommand.findViewInitialized
+      result += MacroCommand.findViewInitialize()
+    result += tabs + '@findEditor?.model?.buffer?.lines[0] = "' + @findText + '"\n'
+    result += tabs + '@replaceEditor?.model?.buffer?.lines[0] = "' + @replaceText + '"\n'
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:replace-all')\n"
+    result
+
+  toSaveString: ->
+    result = '*:RPLALL\n'
+    result += ':F:' + @findText + '\n'
+    result += ':R:' + @replaceText + '\n'
+    result
+
 module.exports =
     MacroCommand: MacroCommand
     InputTextCommand: InputTextCommand
     KeydownCommand: KeydownCommand
     DispatchCommand: DispatchCommand
+    FindNextCommand: FindNextCommand
+    FindPreviousCommand: FindPreviousCommand
+    FindNextSelectedCommand: FindNextSelectedCommand
+    FindPreviousSelectedCommand: FindPreviousSelectedCommand
+    SetSelectionAsFindPatternCommand: SetSelectionAsFindPatternCommand
+    ReplacePreviousCommand: ReplacePreviousCommand
+    ReplaceNextCommand: ReplaceNextCommand
+    ReplaceAllCommand: ReplaceAllCommand

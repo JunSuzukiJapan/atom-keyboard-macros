@@ -6,6 +6,7 @@ OneLineInputView = require './one-line-input-view'
 Compiler = require './keyevents-compiler'
 {MacroCommand, DispatchCommand} = require './macro-command'
 fs = require 'fs'
+FindAndReplace = require './find-and-replace'
 
 module.exports = AtomKeyboardMacros =
   atomKeyboardMacrosView: null
@@ -30,6 +31,8 @@ module.exports = AtomKeyboardMacros =
   quick_save_dirname: null
   quick_save_filename: null
   macro_dirname: null
+
+  find: null
 
   activate: (state) ->
     @quick_save_dirname = atom.packages.resolvePackagePath('atom-keyboard-macros') + '/__quick/'
@@ -64,12 +67,16 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:load': => @load()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:all_macros_to_new_text_editor': => @all_macros_to_new_text_editor()
 
+    #@subscriptions.add atom.commands.add 'atom-workspace', 'find-and-replace:replace-all': => @replaceAll()
+
     # make event listener
     @eventListener = @newHandleKeyboardEvent.bind(this)
     @escapeListener = @onEscapeKey.bind(this)
 
     @keyCaptured = false
     @compiler = new Compiler()
+    @find = new FindAndReplace()
+    @find.activate()
 
   deactivate: ->
     @oneLineInputPanel.destroy()
@@ -111,6 +118,8 @@ module.exports = AtomKeyboardMacros =
     @keySequence = []
     @keyCaptured = true
     window.addEventListener('keydown', @eventListener, true)
+    #@find.getFindAndReplaceMethods()
+    @find.startRecording(@keySequence)
 
   #
   # stop recording keyboard macros
@@ -120,6 +129,7 @@ module.exports = AtomKeyboardMacros =
     @keyCaptured = false
     this.setText('end recording keyboard macros.')
     @compiledCommands = @compiler.compile(@keySequence)
+    @find.stopRecording()
 
   #
   # Util method: execute macro once
@@ -253,7 +263,7 @@ module.exports = AtomKeyboardMacros =
       if err
         console.error err
       else
-        macros = MacroCommand.loadStringAsMacroCommands text
+        macros = MacroCommand.loadStringAsMacroCommands text, self.find
         for name, cmds of macros
           #console.log('name: ', name, ', cmds: ', cmds)
           self.addNamedMacroTable(name, cmds)
@@ -294,8 +304,9 @@ module.exports = AtomKeyboardMacros =
     @oneLineInputPanel.show()
     @oneLineInputView.input.focus()
     window.addEventListener('keydown', @escapeListener, true)
+    self = this
     @oneLineInputView.setCallback (text) ->
-      execute_named_macro_with_string(text)
+      self.execute_named_macro_with_string(text)
       self.oneLineInputPanel.hide()
 
   execute_named_macro_with_string: (name) ->

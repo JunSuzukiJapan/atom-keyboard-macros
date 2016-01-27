@@ -5,64 +5,81 @@ AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 
 module.exports =
 class Compiler
-  compile: (keySequence)->
-    result = []
-    seq = []
-    isTextMode = true
-    hasNextStroke = false
-    keystroke = ''
+  result = []
+  seq = []
+  isTextMode = true
+  hasNextStroke = false
+  keystroke = ''
+
+  compile: (keySequence) ->
+    @result = []
+    @seq = []
+    @isTextMode = true
+    @hasNextStroke = false
+    @keystroke = ''
 
     for e in keySequence
-      #console.log('e: ', e)
-
-      if(e.keyIdentifier.match(/Control|Shift|Alt|Meta|Cmd/)) # skip meta keys
-        continue
-
-      if e.altKey || e.ctrlKey || e.metaKey || hasNextStroke
-        if isTextMode and seq.length != 0
-          result.push(new InputTextCommand(seq))
-
-        stroke = keystrokeForKeyboardEvent(e)
-        if keystroke.length == 0
-          keystroke = stroke
-        else
-          keystroke = keystroke + ' ' + stroke
-
-        bindings = atom.keymaps.findKeyBindings({keystrokes: keystroke})
-        if bindings.length == 0 || @notTextEditorCommand(bindings)
-          isTextMode = false
-          hasNextStroke = true
-          seq = [e]
-
-        else
-          isTextMode = true
-          seq = []
-          hasNextStroke = false
-          keystroke = ''
-          if not @isAtomKeyboardMacrosCommand(bindings)
-            result.push(new DispatchCommand(stroke))
-
-      else if @isNotCharKey(e)
-        if isTextMode
-          isTextMode = false
-          if seq.length > 0
-            result.push(new InputTextCommand(seq))
-          result.push(new KeydownCommand([e]))
-          seq = []
-
-        else
-          seq.push(e)
+      if @isKeyEvent(e)
+        @parseKeyEvent(e)
 
       else
-        if isTextMode
-          seq.push(e)
-        else
-          if not @isAtomKeyboardMacrosCommandSequence(seq)
-            result.push(new KeydownCommand(seq))
-          isTextMode = true
-          seq = [e]
+        @parseFindAndReplaceEvent(e)
 
-    result
+    @result
+
+  parseFindAndReplaceEvent: (e) ->
+    @result.push(e)
+
+  parseKeyEvent: (e) ->
+    if(e.keyIdentifier?.match(/Control|Shift|Alt|Meta|Cmd/)) # skip meta keys
+      return
+
+    if e.altKey || e.ctrlKey || e.metaKey || hasNextStroke
+      if @isTextMode and @seq.length != 0
+        @result.push(new InputTextCommand(@seq))
+
+      stroke = keystrokeForKeyboardEvent(e)
+      if keystroke.length == 0
+        @keystroke = stroke
+      else
+        @keystroke = @keystroke + ' ' + stroke
+
+      bindings = atom.keymaps.findKeyBindings({keystrokes: @keystroke})
+      if bindings.length == 0 || @notTextEditorCommand(bindings)
+        @isTextMode = false
+        @hasNextStroke = true
+        @seq = [e]
+
+      else
+        @isTextMode = true
+        @seq = []
+        @hasNextStroke = false
+        keystroke = ''
+        if not @isAtomKeyboardMacrosCommand(bindings)
+          @result.push(new DispatchCommand(stroke))
+
+    else if @isNotCharKey(e)
+      if @isTextMode
+        @isTextMode = false
+        if @seq.length > 0
+          @result.push(new InputTextCommand(@seq))
+        @result.push(new KeydownCommand([e]))
+        @seq = []
+
+      else
+        @seq.push(e)
+
+    else
+      if @isTextMode
+        @seq.push(e)
+      else
+        if not @isAtomKeyboardMacrosCommandSequence(@seq)
+          @result.push(new KeydownCommand(@seq))
+        @isTextMode = true
+        @seq = [e]
+
+  isKeyEvent: (e) ->
+    e.keyIdentifier
 
   isNotCharKey: (e) ->
     e.keyIdentifier.match(/Enter|Up|Down|Left|Right|PageUp|PageDown|Escape|Backspace|Delete|Tab|Home|End/) ||
