@@ -44,6 +44,12 @@ class FindAndReplace
         item.replaceAll = @replaceAll
 
     @replaceAllButton.removeEventListener('on', @replaceAllButtonHook)
+    @replaceNextButton.removeEventListener('on', @replaceNextButtonHook)
+    @nextButton.removeEventListener('on', @nextButtonHook)
+    @regexOptionButton.removeEventListener('on', @regexOptionButtonHook)
+    @caseOptionButton.removeEventListener('on', @caseOptionButtonHook)
+    @selectionOptionButton.removeEventListener('on', @selectionOptionButtonHook)
+    @wholeWordOptionButton.removeEventListener('on', @wholeWordOptionButtonHook)
 
 
   #
@@ -108,7 +114,34 @@ class FindAndReplace
           self.replaceAllMonitor()
         @replaceAllButton.on 'click', @replaceAllButtonHook
 
-        #console.log('item',item)
+        @replaceNextButtonHook = (e) ->
+          self.replaceNextMonitor()
+        @replaceNextButton.on 'click', @replaceNextButtonHook
+
+        @nextButtonHook = (e) ->
+          self.findNextMonitor()
+        @nextButton.on 'click', @nextButtonHook
+
+        @regexOptionButtonHook = (e) ->
+          console.log('reg', e)
+          #self.regexOptionButtonMonitor()
+        @regexOptionButton.on 'click', @regexOptionButtonHook
+
+        @caseOptionButtonHook = (e) ->
+          console.log('case', e)
+          #self.caseOptionButtonMonitor()
+        @caseOptionButton.on 'click', @caseOptionButtonHook
+
+        @selectionOptionButtonHook = (e) ->
+          console.log('selection', e)
+          #self.selectionOptionButtonMonitor()
+        @selectionOptionButton.on 'click', @selectionOptionButtonHook
+
+        @wholeWordOptionButtonHook = (e) ->
+          console.log('whole word', e)
+          #self.wholeWordOptionButtonMonitor()
+        @wholeWordOptionButton.on 'click', @wholeWordOptionButtonHook
+
 
         break
 
@@ -205,113 +238,3 @@ class FindAndReplace
     if not @isRecording
       return
     @macroSequence.push(new ReplaceAllCommand(this, @getFindText(), @getReplaceText()))
-
-  ###
-  find-and-replace:find-next: true
-  find-and-replace:find-next-selected: true
-  find-and-replace:find-previous: true
-  find-and-replace:find-previous-selected: true
-  find-and-replace:replace-all: true
-  find-and-replace:replace-next: true
-  find-and-replace:select-all: true
-  find-and-replace:select-next: true
-  #find-and-replace:show: true
-  #find-and-replace:show-replace: true
-  find-and-replace:toggle: true
-  #find-and-replace:use-selection-as-find-pattern: true
-  ###
-###
-  handleEvents: ->
-    @handleFindEvents()
-    @handleReplaceEvents()
-
-    @subscriptions.add atom.commands.add 'atom-workspace',
-      'find-and-replace:select-all': => @findNextMonitor
-      'find-and-replace:select-next': => @findPreviousMonitor
-      'find-and-replace:toggle': => @toggleMonitor
-
-  handleFindEvents: ->
-    @subscriptions.add atom.commands.add 'atom-workspace',
-      'find-and-replace:find-next': => @findNextMonitor
-      'find-and-replace:find-previous': => @findPreviousMonitor
-      'find-and-replace:find-next-selected': @findNextSelectedMonitor
-      'find-and-replace:find-previous-selected': @findPreviousSelectedMonitor
-      'find-and-replace:use-selection-as-find-pattern': @setSelectionAsFindPatternMonitor
-
-  handleReplaceEvents: ->
-    @subscriptions.add atom.commands.add 'atom-workspace',
-      'find-and-replace:replace-previous': @replacePreviousMonitor
-      'find-and-replace:replace-next': @replaceNextMonitor
-      'find-and-replace:replace-all': @replaceAllMonitor
-
-
-
-
-
-
-
-
-
-
-  search: (findPattern, options) ->
-    if arguments.length is 1 and typeof findPattern is 'object'
-      options = findPattern
-      findPattern = null
-    findPattern ?= @findEditor.getText()
-    @model.search(findPattern, options)
-
-  findAll: (options={focusEditorAfter: true}) =>
-    @findAndSelectResult(@selectAllMarkers, options)
-
-  findNext: (options={focusEditorAfter: false}) =>
-    @findAndSelectResult(@selectFirstMarkerAfterCursor, options)
-
-  findPrevious: (options={focusEditorAfter: false}) =>
-    @findAndSelectResult(@selectFirstMarkerBeforeCursor, options)
-
-  findAndSelectResult: (selectFunction, {focusEditorAfter, fieldToFocus}) =>
-    @search()
-    @findHistoryCycler.store()
-
-    if @markers?.length > 0
-      selectFunction()
-      if fieldToFocus
-        fieldToFocus.focus()
-      else if focusEditorAfter
-        workspaceElement = atom.views.getView(atom.workspace)
-        workspaceElement.focus()
-      else
-        @findEditor.focus()
-    else
-      atom.beep()
-
-  replaceNext: =>
-    @replace('findNext', 'firstMarkerIndexStartingFromCursor')
-
-  replacePrevious: =>
-    @replace('findPrevious', 'firstMarkerIndexBeforeCursor')
-
-  replace: (nextOrPreviousFn, nextIndexFn) ->
-    @search()
-    @findHistoryCycler.store()
-    @replaceHistoryCycler.store()
-
-    if @markers?.length > 0
-      unless currentMarker = @model.currentResultMarker
-        if position = @[nextIndexFn]()
-          currentMarker = @markers[position.index]
-
-      @model.replace([currentMarker], @replaceEditor.getText())
-      @[nextOrPreviousFn](fieldToFocus: @replaceEditor)
-    else
-      atom.beep()
-
-  replaceAll: =>
-    @search()
-    if @markers?.length
-      @findHistoryCycler.store()
-      @replaceHistoryCycler.store()
-      @model.replace(@markers, @replaceEditor.getText())
-    else
-      atom.beep()
-###

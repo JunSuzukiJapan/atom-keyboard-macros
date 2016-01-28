@@ -78,6 +78,22 @@ class MacroCommand
                 replaceText = line.substring(3)
                 cmds.push(new ReplaceAllCommand(findAndReplace, editText, replaceText))
 
+              when 'RPLNXT'
+                console.log(findAndReplace)
+                line = lines[index++]
+                editText = line.substring(3)
+                line = lines[index++]
+                replaceText = line.substring(3)
+                cmds.push(new ReplaceNextCommand(findAndReplace, editText, replaceText))
+
+              when 'RPLPRV'
+                console.log(findAndReplace)
+                line = lines[index++]
+                editText = line.substring(3)
+                line = lines[index++]
+                replaceText = line.substring(3)
+                cmds.push(new ReplacePreviousCommand(findAndReplace, editText, replaceText))
+
 
 
 
@@ -293,8 +309,19 @@ class ReplacePreviousCommand extends MacroCommand
     @findAndReplace.replacePrevious()
 
   toString: (tabs) ->
+    result = ''
+    if !MacroCommand.findViewInitialized
+      result += MacroCommand.findViewInitialize()
+    result += tabs + '@findEditor?.model?.buffer?.lines[0] = "' + @findText + '"\n'
+    result += tabs + '@replaceEditor?.model?.buffer?.lines[0] = "' + @replaceText + '"\n'
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:replace-previous')\n"
+    result
 
   toSaveString: ->
+    result = '*:RPLPRV\n'
+    result += ':F:' + @findText + '\n'
+    result += ':R:' + @replaceText + '\n'
+    result
 
 class ReplaceNextCommand extends MacroCommand
   constructor: (@findAndReplace, @findText, @replaceText) ->
@@ -305,8 +332,19 @@ class ReplaceNextCommand extends MacroCommand
     @findAndReplace.replaceNext()
 
   toString: (tabs) ->
+    result = ''
+    if !MacroCommand.findViewInitialized
+      result += MacroCommand.findViewInitialize()
+    result += tabs + '@findEditor?.model?.buffer?.lines[0] = "' + @findText + '"\n'
+    result += tabs + '@replaceEditor?.model?.buffer?.lines[0] = "' + @replaceText + '"\n'
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:replace-next')\n"
+    result
 
   toSaveString: ->
+    result = '*:RPLNXT\n'
+    result += ':F:' + @findText + '\n'
+    result += ':R:' + @replaceText + '\n'
+    result
 
 class ReplaceAllCommand extends MacroCommand
   constructor: (@findAndReplace, @findText, @replaceText) ->
