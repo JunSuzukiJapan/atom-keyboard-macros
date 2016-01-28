@@ -71,7 +71,6 @@ class MacroCommand
             cmdName = line.substring(2)
             switch cmdName
               when 'RPLALL'
-                console.log(findAndReplace)
                 line = lines[index++]
                 editText = line.substring(3)
                 line = lines[index++]
@@ -79,7 +78,6 @@ class MacroCommand
                 cmds.push(new ReplaceAllCommand(findAndReplace, editText, replaceText))
 
               when 'RPLNXT'
-                console.log(findAndReplace)
                 line = lines[index++]
                 editText = line.substring(3)
                 line = lines[index++]
@@ -87,14 +85,36 @@ class MacroCommand
                 cmds.push(new ReplaceNextCommand(findAndReplace, editText, replaceText))
 
               when 'RPLPRV'
-                console.log(findAndReplace)
                 line = lines[index++]
                 editText = line.substring(3)
                 line = lines[index++]
                 replaceText = line.substring(3)
                 cmds.push(new ReplacePreviousCommand(findAndReplace, editText, replaceText))
 
+              when 'SETPTN'
+                cmds.push(new SetSelectionAsFindPatternCommand(findAndReplace))
 
+              when 'FNDPRVSEL'
+                line = lines[index++]
+                editText = line.substring(3)
+                cmds.push(new FindPreviousSelectedCommand(findAndReplace, editText))
+
+              when 'FNDNXTSEL'
+                line = lines[index++]
+                editText = line.substring(3)
+                cmds.push(new FindNextSelectedCommand(findAndReplace, editText))
+
+              when 'FNDPRV'
+                line = lines[index++]
+                editText = line.substring(3)
+                options = {} # TODO: set options
+                cmds.push(new FindPreviousCommand(findAndReplace, editText, options))
+
+              when 'FNDPRV'
+                line = lines[index++]
+                editText = line.substring(3)
+                options = {} # TODO: set options
+                cmds.push(new FindNextCommand(findAndReplace, editText, options))
 
 
           else
@@ -254,8 +274,18 @@ class FindNextCommand extends MacroCommand
     @findAndReplace.findNext(@options)
 
   toString: (tabs) ->
+    result = ''
+    if !MacroCommand.findViewInitialized
+      result += MacroCommand.findViewInitialize()
+    result += tabs + '@findEditor?.model?.buffer?.lines[0] = "' + @findText + '"\n'
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:find-next')\n"
+    result
 
   toSaveString: ->
+    result = '*:FNDPRV\n'
+    result += ':F:' + @findText + '\n'
+    # TODO: save options
+    result
 
 class FindPreviousCommand extends MacroCommand
   constructor: (@findAndReplace, @text, @options) ->
@@ -265,8 +295,18 @@ class FindPreviousCommand extends MacroCommand
     @findAndReplace.findPrevious(@options)
 
   toString: (tabs) ->
+    result = ''
+    if !MacroCommand.findViewInitialized
+      result += MacroCommand.findViewInitialize()
+    result += tabs + '@findEditor?.model?.buffer?.lines[0] = "' + @findText + '"\n'
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:find-previous')\n"
+    result
 
   toSaveString: ->
+    result = '*:FNDPRV\n'
+    result += ':F:' + @findText + '\n'
+    # TODO: save options
+    result
 
 class FindNextSelectedCommand extends MacroCommand
   constructor: (@findAndReplace, @text) ->
@@ -276,8 +316,17 @@ class FindNextSelectedCommand extends MacroCommand
     @findAndReplace.findNextSecected()
 
   toString: (tabs) ->
+    result = ''
+    if !MacroCommand.findViewInitialized
+      result += MacroCommand.findViewInitialize()
+    result += tabs + '@findEditor?.model?.buffer?.lines[0] = "' + @findText + '"\n'
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:find-next-selected')\n"
+    result
 
   toSaveString: ->
+    result = '*:FNDNXTSEL\n'
+    result += ':F:' + @findText + '\n'
+    result
 
 class FindPreviousSelectedCommand extends MacroCommand
   constructor: (@findAndReplace, @text) ->
@@ -287,8 +336,17 @@ class FindPreviousSelectedCommand extends MacroCommand
     @findAndReplace.findPreviousSelected()
 
   toString: (tabs) ->
+    result = ''
+    if !MacroCommand.findViewInitialized
+      result += MacroCommand.findViewInitialize()
+    result += tabs + '@findEditor?.model?.buffer?.lines[0] = "' + @findText + '"\n'
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:find-previous-selected')\n"
+    result
 
   toSaveString: ->
+    result = '*:FNDPRVSEL\n'
+    result += ':F:' + @findText + '\n'
+    result
 
 class SetSelectionAsFindPatternCommand extends MacroCommand
   constructor: (@findAndReplace)->
@@ -297,8 +355,17 @@ class SetSelectionAsFindPatternCommand extends MacroCommand
     @findAndReplace.setSelectionAsFindPattern()
 
   toString: (tabs) ->
+    result = ''
+    if !MacroCommand.findViewInitialized
+      result += MacroCommand.findViewInitialize()
+    result += tabs + "atom.commands.dispatch(editorElement, 'find-and-replace:use-selection-as-find-pattern')\n"
+    result
 
   toSaveString: ->
+    result = '*:SETPTN\n'
+    result += ':F:' + @findText + '\n'
+    result += ':R:' + @replaceText + '\n'
+    result
 
 class ReplacePreviousCommand extends MacroCommand
   constructor: (@findAndReplace, @findText, @replaceText) ->
