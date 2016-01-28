@@ -10,7 +10,11 @@
       "atom-keyboard-macros:end_kbd_macro",
       "atom-keyboard-macros:call_last_kbd_macro",
       "atom-keyboard-macros:repeat_last_kbd_macro",
-      "atom-keyboard-macros:toggle"
+      "atom-keyboard-macros:toggle",
+      "atom-keyboard-macros:quick_save",
+      "atom-keyboard-macros:quick_load",
+      "atom-keyboard-macros:save",
+      "atom-keyboard-macros:load"
     ]
   },
   "repository": "https://github.com/JunSuzukiJapan/atom-keyboard-macros",
