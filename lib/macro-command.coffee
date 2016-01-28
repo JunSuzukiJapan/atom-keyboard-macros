@@ -75,48 +75,136 @@ class MacroCommand
                 editText = line.substring(3)
                 line = lines[index++]
                 replaceText = line.substring(3)
-                cmds.push(new ReplaceAllCommand(findAndReplace, editText, replaceText))
+                line = lines[index++].substring(3)
+                opts = line.split(',')
+                useRegex = opts[0].indexOf('true') >= 0
+                caseSensitive = opts[1].indexOf('true') >= 0
+                inCurrentSelection = opts[2].indexOf('true') >= 0
+                wholeWord = opts[3].indexOf('true') >= 0
+                cmds.push(new ReplaceAllCommand(findAndReplace, editText, replaceText, {
+                  useRegex: useRegex
+                  caseSensitive: caseSensitive
+                  inCurrentSelection: inCurrentSelection
+                  wholeWord: wholeWord
+                }))
 
               when 'RPLNXT'
                 line = lines[index++]
                 editText = line.substring(3)
                 line = lines[index++]
                 replaceText = line.substring(3)
-                cmds.push(new ReplaceNextCommand(findAndReplace, editText, replaceText))
+                line = lines[index++].substring(3)
+                opts = line.split(',')
+                useRegex = opts[0].indexOf('true') >= 0
+                caseSensitive = opts[1].indexOf('true') >= 0
+                inCurrentSelection = opts[2].indexOf('true') >= 0
+                wholeWord = opts[3].indexOf('true') >= 0
+                cmds.push(new ReplaceNextCommand(findAndReplace, editText, replaceText, {
+                  useRegex: useRegex
+                  caseSensitive: caseSensitive
+                  inCurrentSelection: inCurrentSelection
+                  wholeWord: wholeWord
+                }))
 
               when 'RPLPRV'
                 line = lines[index++]
                 editText = line.substring(3)
                 line = lines[index++]
                 replaceText = line.substring(3)
-                cmds.push(new ReplacePreviousCommand(findAndReplace, editText, replaceText))
+                line = lines[index++].substring(3)
+                opts = line.split(',')
+                useRegex = opts[0].indexOf('true') >= 0
+                caseSensitive = opts[1].indexOf('true') >= 0
+                inCurrentSelection = opts[2].indexOf('true') >= 0
+                wholeWord = opts[3].indexOf('true') >= 0
+                cmds.push(new ReplacePreviousCommand(findAndReplace, editText, replaceText, {
+                  useRegex: useRegex
+                  caseSensitive: caseSensitive
+                  inCurrentSelection: inCurrentSelection
+                  wholeWord: wholeWord
+                }))
 
               when 'SETPTN'
-                cmds.push(new SetSelectionAsFindPatternCommand(findAndReplace))
+                line = lines[index++].substring(3)
+                opts = line.split(',')
+                useRegex = opts[0].indexOf('true') >= 0
+                caseSensitive = opts[1].indexOf('true') >= 0
+                inCurrentSelection = opts[2].indexOf('true') >= 0
+                wholeWord = opts[3].indexOf('true') >= 0
+                cmds.push(new SetSelectionAsFindPatternCommand(findAndReplace, {
+                  useRegex: useRegex
+                  caseSensitive: caseSensitive
+                  inCurrentSelection: inCurrentSelection
+                  wholeWord: wholeWord
+                }))
 
               when 'FNDPRVSEL'
                 line = lines[index++]
                 editText = line.substring(3)
-                cmds.push(new FindPreviousSelectedCommand(findAndReplace, editText))
+                line = lines[index++].substring(3)
+                opts = line.split(',')
+                useRegex = opts[0].indexOf('true') >= 0
+                caseSensitive = opts[1].indexOf('true') >= 0
+                inCurrentSelection = opts[2].indexOf('true') >= 0
+                wholeWord = opts[3].indexOf('true') >= 0
+                cmds.push(new FindPreviousSelectedCommand(findAndReplace, editText, {
+                  useRegex: useRegex
+                  caseSensitive: caseSensitive
+                  inCurrentSelection: inCurrentSelection
+                  wholeWord: wholeWord
+                }))
 
               when 'FNDNXTSEL'
                 line = lines[index++]
                 editText = line.substring(3)
-                cmds.push(new FindNextSelectedCommand(findAndReplace, editText))
+                line = lines[index++].substring(3)
+                opts = line.split(',')
+                useRegex = opts[0].indexOf('true') >= 0
+                caseSensitive = opts[1].indexOf('true') >= 0
+                inCurrentSelection = opts[2].indexOf('true') >= 0
+                wholeWord = opts[3].indexOf('true') >= 0
+                cmds.push(new FindNextSelectedCommand(findAndReplace, editText, {
+                  useRegex: useRegex
+                  caseSensitive: caseSensitive
+                  inCurrentSelection: inCurrentSelection
+                  wholeWord: wholeWord
+                }))
 
               when 'FNDPRV'
                 line = lines[index++]
                 editText = line.substring(3)
                 #options = {} # TODO: set options
                 #cmds.push(new FindPreviousCommand(findAndReplace, editText, options))
-                cmds.push(new FindPreviousCommand(findAndReplace, editText))
+                line = lines[index++].substring(3)
+                opts = line.split(',')
+                useRegex = opts[0].indexOf('true') >= 0
+                caseSensitive = opts[1].indexOf('true') >= 0
+                inCurrentSelection = opts[2].indexOf('true') >= 0
+                wholeWord = opts[3].indexOf('true') >= 0
+                cmds.push(new FindPreviousCommand(findAndReplace, editText, {
+                  useRegex: useRegex
+                  caseSensitive: caseSensitive
+                  inCurrentSelection: inCurrentSelection
+                  wholeWord: wholeWord
+                }))
 
               when 'FNDPRV'
                 line = lines[index++]
                 editText = line.substring(3)
                 #options = {} # TODO: set options
                 #cmds.push(new FindNextCommand(findAndReplace, editText, options))
-                cmds.push(new FindNextCommand(findAndReplace, editText))
+                line = lines[index++].substring(3)
+                opts = line.split(',')
+                useRegex = opts[0].indexOf('true') >= 0
+                caseSensitive = opts[1].indexOf('true') >= 0
+                inCurrentSelection = opts[2].indexOf('true') >= 0
+                wholeWord = opts[3].indexOf('true') >= 0
+                cmds.push(new FindNextCommand(findAndReplace, editText, {
+                  useRegex: useRegex
+                  caseSensitive: caseSensitive
+                  inCurrentSelection: inCurrentSelection
+                  wholeWord: wholeWord
+                }))
 
 
           else
@@ -267,13 +355,41 @@ class KeydownCommand extends MacroCommand
       result += ':' + keystrokeForKeyboardEvent(e) + '\n'
     result
 
-class FindNextCommand extends MacroCommand
-  #constructor: (@findAndReplace, @text, @options) ->
-  constructor: (@findAndReplace, @text) ->
+#
+# Find and Replace
+#
+
+class FRBaseCommand extends MacroCommand
+  useRegex: false
+  caseSensitive: false
+  inCurrentSelection: false
+  wholeWord: false
+
+  constructor: (options) ->
+    @useRegex = options.useRegex
+    @caseSensitive = options.caseSensitive
+    @inCurrentSelection = options.inCurrentSelection
+    @wholeWord = options.wholeWord
+
+  setOptions: (findAndReplace) ->
+    opts = findAndReplace.model?.getFindOptions()
+    opts?.useRegex = @useRegex
+    opts?.caseSensitive = @caseSensitive
+    opts?.inCurrentSelection = @inCurrentSelection
+    opts?.wholeWord = @wholeWord
+    findAndReplace.model?.setFindOptions(opts?)
+
+#
+# Find Next
+class FindNextCommand extends FRBaseCommand
+  constructor: (@findAndReplace, @text, @options) ->
+    super(@options)
 
   execute: ->
+    # set options
+    @setOptions(@findAndReplace)
+    # execute
     @findAndReplace.setFindText(@text)
-    #@findAndReplace.findNext(@options)
     @findAndReplace.findNext(@options)
 
   toString: (tabs) ->
@@ -287,15 +403,20 @@ class FindNextCommand extends MacroCommand
   toSaveString: ->
     result = '*:FNDPRV\n'
     result += ':F:' + @findText + '\n'
+    result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
-class FindPreviousCommand extends MacroCommand
-  #constructor: (@findAndReplace, @text, @options) ->
-  constructor: (@findAndReplace, @text) ->
+#
+# Find Previous
+class FindPreviousCommand extends FRBaseCommand
+  constructor: (@findAndReplace, @text, @options) ->
+    super(@options)
 
   execute: ->
+    # set options
+    @setOptions(@findAndReplace)
+    # execute
     @findAndReplace.setText(@text)
-    #@findAndReplace.findPrevious(@options)
     @findAndReplace.findPrevious()
 
   toString: (tabs) ->
@@ -309,12 +430,19 @@ class FindPreviousCommand extends MacroCommand
   toSaveString: ->
     result = '*:FNDPRV\n'
     result += ':F:' + @findText + '\n'
+    result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
-class FindNextSelectedCommand extends MacroCommand
-  constructor: (@findAndReplace, @text) ->
+#
+# Find Next Selected
+class FindNextSelectedCommand extends FRBaseCommand
+  constructor: (@findAndReplace, @text, @options) ->
+    super(@options)
 
   execute: ->
+    # set options
+    @setOptions(@findAndReplace)
+    # execute
     @findAndReplace.setText(@text)
     @findAndReplace.findNextSecected()
 
@@ -329,12 +457,19 @@ class FindNextSelectedCommand extends MacroCommand
   toSaveString: ->
     result = '*:FNDNXTSEL\n'
     result += ':F:' + @findText + '\n'
+    result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
-class FindPreviousSelectedCommand extends MacroCommand
-  constructor: (@findAndReplace, @text) ->
+#
+# Find Previous Selected
+class FindPreviousSelectedCommand extends FRBaseCommand
+  constructor: (@findAndReplace, @text, @options) ->
+    super(@options)
 
   execute: ->
+    # set options
+    @setOptions(@findAndReplace)
+    # execute
     @findAndReplace.setFindText(@text)
     @findAndReplace.findPreviousSelected()
 
@@ -349,12 +484,19 @@ class FindPreviousSelectedCommand extends MacroCommand
   toSaveString: ->
     result = '*:FNDPRVSEL\n'
     result += ':F:' + @findText + '\n'
+    result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
-class SetSelectionAsFindPatternCommand extends MacroCommand
-  constructor: (@findAndReplace)->
+#
+# Set Selection as Find Pattern
+class SetSelectionAsFindPatternCommand extends FRBaseCommand
+  constructor: (@findAndReplace, @options)->
+    super(@options)
 
   execute: ->
+    # set options
+    @setOptions(@findAndReplace)
+    # execute
     @findAndReplace.setSelectionAsFindPattern()
 
   toString: (tabs) ->
@@ -366,14 +508,19 @@ class SetSelectionAsFindPatternCommand extends MacroCommand
 
   toSaveString: ->
     result = '*:SETPTN\n'
-    result += ':F:' + @findText + '\n'
-    result += ':R:' + @replaceText + '\n'
+    result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
-class ReplacePreviousCommand extends MacroCommand
-  constructor: (@findAndReplace, @findText, @replaceText) ->
+#
+# Replace Previous
+class ReplacePreviousCommand extends FRBaseCommand
+  constructor: (@findAndReplace, @findText, @replaceText, @options) ->
+    super(@options)
 
   execute: ->
+    # set options
+    @setOptions(@findAndReplace)
+    # execute
     @findAndReplace.setFindText(@findText)
     @findAndReplace.setReplaceText(@replaceText)
     @findAndReplace.replacePrevious()
@@ -391,12 +538,19 @@ class ReplacePreviousCommand extends MacroCommand
     result = '*:RPLPRV\n'
     result += ':F:' + @findText + '\n'
     result += ':R:' + @replaceText + '\n'
+    result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
-class ReplaceNextCommand extends MacroCommand
-  constructor: (@findAndReplace, @findText, @replaceText) ->
+#
+# Replace Next
+class ReplaceNextCommand extends FRBaseCommand
+  constructor: (@findAndReplace, @findText, @replaceText, @options) ->
+    super(@options)
 
   execute: ->
+    # set options
+    @setOptions(@findAndReplace)
+    # execute
     @findAndReplace.setFindText(@findText)
     @findAndReplace.setReplaceText(@replaceText)
     @findAndReplace.replaceNext()
@@ -414,12 +568,19 @@ class ReplaceNextCommand extends MacroCommand
     result = '*:RPLNXT\n'
     result += ':F:' + @findText + '\n'
     result += ':R:' + @replaceText + '\n'
+    result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
-class ReplaceAllCommand extends MacroCommand
-  constructor: (@findAndReplace, @findText, @replaceText) ->
+#
+# Replace All
+class ReplaceAllCommand extends FRBaseCommand
+  constructor: (@findAndReplace, @findText, @replaceText, @options) ->
+    super(@options)
 
   execute: ->
+    # set options
+    @setOptions(@findAndReplace)
+    # execute
     @findAndReplace.setFindText(@findText)
     @findAndReplace.setReplaceText(@replaceText)
     @findAndReplace.replaceAll()
@@ -437,6 +598,7 @@ class ReplaceAllCommand extends MacroCommand
     result = '*:RPLALL\n'
     result += ':F:' + @findText + '\n'
     result += ':R:' + @replaceText + '\n'
+    result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
 module.exports =

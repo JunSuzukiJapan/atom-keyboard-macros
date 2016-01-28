@@ -4,8 +4,16 @@
 
 module.exports =
 class FindAndReplace
+  findView: null
   findEditor: null
   replaceEditor: null
+
+  ###
+  regexOption: false
+  caseSensitive: false
+  inCurrentSelection: false
+  wholeWord: false
+  ###
 
   #toggle: ->
   findNext: null
@@ -65,7 +73,8 @@ class FindAndReplace
       item = panel.item
       name = item?.__proto__?.constructor?.name
       if name == 'FindView'
-        console.log('item', item)
+        #console.log('item', item)
+        @findView = item
 
         @findNext = item.findNext
         @findPrevious = item.findPrevious
@@ -122,25 +131,23 @@ class FindAndReplace
           self.findNextMonitor()
         @nextButton.on 'click', @nextButtonHook
 
+        ###
         @regexOptionButtonHook = (e) ->
-          console.log('reg', e)
-          #self.regexOptionButtonMonitor()
+          self.regexOptionButtonMonitor()
         @regexOptionButton.on 'click', @regexOptionButtonHook
 
         @caseOptionButtonHook = (e) ->
-          console.log('case', e)
-          #self.caseOptionButtonMonitor()
+          self.caseOptionButtonMonitor()
         @caseOptionButton.on 'click', @caseOptionButtonHook
 
         @selectionOptionButtonHook = (e) ->
-          console.log('selection', e)
-          #self.selectionOptionButtonMonitor()
+          self.selectionOptionButtonMonitor()
         @selectionOptionButton.on 'click', @selectionOptionButtonHook
 
         @wholeWordOptionButtonHook = (e) ->
-          console.log('whole word', e)
-          #self.wholeWordOptionButtonMonitor()
+          self.wholeWordOptionButtonMonitor()
         @wholeWordOptionButton.on 'click', @wholeWordOptionButtonHook
+        ###
 
         break
 
@@ -168,6 +175,28 @@ class FindAndReplace
   stopRecording: ->
     @isRecording = false
 
+  ###
+  #
+  # hook option buttons on change
+  #
+  regexOptionButtonMonitor: ->
+    options = @findView.model?.getFindOptions()
+    @regexOption = options?.useRegex
+
+  caseOptionButtonMonitor: ->
+    options = @findView.model?.getFindOptions()
+    @caseSensitive = options?.caseSensitive
+
+  selectionOptionButtonMonitor: ->
+    options = @findView.model?.getFindOptions()
+    @inCurrentSelection = options?.inCurrentSelection
+
+  wholeWordOptionButtonMonitor: ->
+    options = @findView.model?.getFindOptions()
+    @wholeWord = options.wholeWord
+  ###
+
+
   #
   # hook handlers
   #
@@ -177,49 +206,57 @@ class FindAndReplace
   findNextMonitor: ->
     if not @isRecording
       return
-    #@macroSequence.push(new FindNextCommand(this, @getFindText(), options))
-    @macroSequence.push(new FindNextCommand(this, @getFindText()))
+    options = @findView.model?.getFindOptions()
+    @macroSequence.push(new FindNextCommand(this, @getFindText(), options))
+    #@macroSequence.push(new FindNextCommand(this, @getFindText()))
 
   #findPrevious: (options={focusEditorAfter: false}) =>
   #findPreviousMonitor: (options={focusEditorAfter: false}) ->
   findPreviousMonitor: ->
     if not @isRecording
       return
-    #@macroSequence.push(new FindPreviousCommand(this, @getFindText(), options))
-    @macroSequence.push(new FindPreviousCommand(this, @getFindText()))
+    options = @findView.model?.getFindOptions()
+    @macroSequence.push(new FindPreviousCommand(this, @getFindText(), options))
+    #@macroSequence.push(new FindPreviousCommand(this, @getFindText()))
 
   # findNextSelected: =>
   findNextSelectedMonitor: ->
     if not @isRecording
       return
-    @macroSequence.push(new FindNextSelectedCommand(this, @getFindText()))
+    options = @findView.model?.getFindOptions()
+    @macroSequence.push(new FindNextSelectedCommand(this, @getFindText(), options))
 
   # findPreviousSelected: =>
   findPreviousSelectedMonitor: ->
     if not @isRecording
       return
-    @macroSequence.push(new FindPreviousSelectedCommand(this, @getFindText()))
+    options = @findView.model?.getFindOptions()
+    @macroSequence.push(new FindPreviousSelectedCommand(this, @getFindText(), options))
 
   # setSelectionAsFindPattern: =>
   setSelectionAsFindPatternMonitor: ->
     if not @isRecording
       return
-    @macroSequence.push(new SetSelectionAsFindPatternCommand(this))
+    options = @findView.model?.getFindOptions()
+    @macroSequence.push(new SetSelectionAsFindPatternCommand(this), options)
 
   # replacePrevious: =>
   replacePreviousMonitor: ->
     if not @isRecording
       return
-    @macroSequence.push(new ReplacePreviousCommand(this, @getFindText(), @getReplaceText()))
+    options = @findView.model?.getFindOptions()
+    @macroSequence.push(new ReplacePreviousCommand(this, @getFindText(), @getReplaceText(), options))
 
   # replaceNext: =>
   replaceNextMonitor: ->
     if not @isRecording
       return
-    @macroSequence.push(new ReplaceNextCommand(this, @getFindText(), @getReplaceText()))
+    options = @findView.model?.getFindOptions()
+    @macroSequence.push(new ReplaceNextCommand(this, @getFindText(), @getReplaceText(), options))
 
   # replaceAll: =>
   replaceAllMonitor: ->
     if not @isRecording
       return
-    @macroSequence.push(new ReplaceAllCommand(this, @getFindText(), @getReplaceText()))
+    options = @findView.model?.getFindOptions()
+    @macroSequence.push(new ReplaceAllCommand(this, @getFindText(), @getReplaceText(), options))
