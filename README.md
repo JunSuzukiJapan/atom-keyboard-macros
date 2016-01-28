@@ -1,6 +1,10 @@
 # atom-keyboard-macros package
 
-keyboard macro extension for Atom.
+Keyboard macro extension for Atom.
+
+# New Features
+
+In version 0.6.0 or later, it also records the operation of the search & replace view.
 
 # Shortcuts
 
