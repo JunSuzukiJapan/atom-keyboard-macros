@@ -208,7 +208,6 @@ class DispatchCommand
         #console.log('bindings', bindings)
         bind = bindings[0]
         @command_name = bind.command
-    #console.log('@command_name', @command_name)
 
   execute: ->
     editor = atom.workspace.getActiveTextEditor()

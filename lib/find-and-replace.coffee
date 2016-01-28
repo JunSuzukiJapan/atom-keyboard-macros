@@ -142,7 +142,6 @@ class FindAndReplace
           #self.wholeWordOptionButtonMonitor()
         @wholeWordOptionButton.on 'click', @wholeWordOptionButtonHook
 
-
         break
 
   # Util
@@ -175,66 +174,48 @@ class FindAndReplace
 
   # findNext: (options={focusEditorAfter: false}) =>
   findNextMonitor: (options={focusEditorAfter: false}) ->
-    #@findNext(options)
-
     if not @isRecording
       return
     @macroSequence.push(new FindNextCommand(this, @getFindText(), options))
 
   #findPrevious: (options={focusEditorAfter: false}) =>
   findPreviousMonitor: (options={focusEditorAfter: false}) ->
-    #@findPrevious(options)
-
     if not @isRecording
       return
     @macroSequence.push(new FindPreviousCommand(this, @getFindText(), options))
 
   # findNextSelected: =>
   findNextSelectedMonitor: ->
-    #@findNextSelected()
-
     if not @isRecording
       return
     @macroSequence.push(new FindNextSelectedCommand(this, @getFindText()))
 
   # findPreviousSelected: =>
   findPreviousSelectedMonitor: ->
-    #@findPreviousSelected()
-
     if not @isRecording
       return
     @macroSequence.push(new FindPreviousSelectedCommand(this, @getFindText()))
 
   # setSelectionAsFindPattern: =>
   setSelectionAsFindPatternMonitor: ->
-    #@setSelectionAsFindPattern()
-
     if not @isRecording
       return
     @macroSequence.push(new SetSelectionAsFindPatternCommand(this))
 
   # replacePrevious: =>
   replacePreviousMonitor: ->
-    #@replacePrevious()
-
     if not @isRecording
       return
     @macroSequence.push(new ReplacePreviousCommand(this, @getFindText(), @getReplaceText()))
 
   # replaceNext: =>
   replaceNextMonitor: ->
-    #@replaceNext()
-
     if not @isRecording
       return
     @macroSequence.push(new ReplaceNextCommand(this, @getFindText(), @getReplaceText()))
 
   # replaceAll: =>
   replaceAllMonitor: ->
-    #@replaceAll()
-
-    console.log('this', this)
-
     if not @isRecording
       return
     @macroSequence.push(new ReplaceAllCommand(this, @getFindText(), @getReplaceText()))
