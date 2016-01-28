@@ -107,14 +107,16 @@ class MacroCommand
               when 'FNDPRV'
                 line = lines[index++]
                 editText = line.substring(3)
-                options = {} # TODO: set options
-                cmds.push(new FindPreviousCommand(findAndReplace, editText, options))
+                #options = {} # TODO: set options
+                #cmds.push(new FindPreviousCommand(findAndReplace, editText, options))
+                cmds.push(new FindPreviousCommand(findAndReplace, editText))
 
               when 'FNDPRV'
                 line = lines[index++]
                 editText = line.substring(3)
-                options = {} # TODO: set options
-                cmds.push(new FindNextCommand(findAndReplace, editText, options))
+                #options = {} # TODO: set options
+                #cmds.push(new FindNextCommand(findAndReplace, editText, options))
+                cmds.push(new FindNextCommand(findAndReplace, editText))
 
 
           else
@@ -266,10 +268,12 @@ class KeydownCommand extends MacroCommand
     result
 
 class FindNextCommand extends MacroCommand
-  constructor: (@findAndReplace, @text, @options) ->
+  #constructor: (@findAndReplace, @text, @options) ->
+  constructor: (@findAndReplace, @text) ->
 
   execute: ->
     @findAndReplace.setFindText(@text)
+    #@findAndReplace.findNext(@options)
     @findAndReplace.findNext(@options)
 
   toString: (tabs) ->
@@ -283,15 +287,16 @@ class FindNextCommand extends MacroCommand
   toSaveString: ->
     result = '*:FNDPRV\n'
     result += ':F:' + @findText + '\n'
-    # TODO: save options
     result
 
 class FindPreviousCommand extends MacroCommand
-  constructor: (@findAndReplace, @text, @options) ->
+  #constructor: (@findAndReplace, @text, @options) ->
+  constructor: (@findAndReplace, @text) ->
 
   execute: ->
     @findAndReplace.setText(@text)
-    @findAndReplace.findPrevious(@options)
+    #@findAndReplace.findPrevious(@options)
+    @findAndReplace.findPrevious()
 
   toString: (tabs) ->
     result = ''
@@ -304,7 +309,6 @@ class FindPreviousCommand extends MacroCommand
   toSaveString: ->
     result = '*:FNDPRV\n'
     result += ':F:' + @findText + '\n'
-    # TODO: save options
     result
 
 class FindNextSelectedCommand extends MacroCommand

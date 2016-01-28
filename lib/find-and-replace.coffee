@@ -173,16 +173,20 @@ class FindAndReplace
   #
 
   # findNext: (options={focusEditorAfter: false}) =>
-  findNextMonitor: (options={focusEditorAfter: false}) ->
+  #findNextMonitor: (options={focusEditorAfter: false}) ->
+  findNextMonitor: ->
     if not @isRecording
       return
-    @macroSequence.push(new FindNextCommand(this, @getFindText(), options))
+    #@macroSequence.push(new FindNextCommand(this, @getFindText(), options))
+    @macroSequence.push(new FindNextCommand(this, @getFindText()))
 
   #findPrevious: (options={focusEditorAfter: false}) =>
-  findPreviousMonitor: (options={focusEditorAfter: false}) ->
+  #findPreviousMonitor: (options={focusEditorAfter: false}) ->
+  findPreviousMonitor: ->
     if not @isRecording
       return
-    @macroSequence.push(new FindPreviousCommand(this, @getFindText(), options))
+    #@macroSequence.push(new FindPreviousCommand(this, @getFindText(), options))
+    @macroSequence.push(new FindPreviousCommand(this, @getFindText()))
 
   # findNextSelected: =>
   findNextSelectedMonitor: ->
