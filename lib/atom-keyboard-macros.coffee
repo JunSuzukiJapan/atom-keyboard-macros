@@ -105,6 +105,9 @@ module.exports = AtomKeyboardMacros =
 
   # @eventListener
   newHandleKeyboardEvent: (e) ->
+    if e.target?.className?.indexOf('editor mini') >= 0
+      return
+    console.log('className', e.target?.className)
     @keySequence.push(e)
 
   #
@@ -181,21 +184,6 @@ module.exports = AtomKeyboardMacros =
     promiss = atom.workspace.open()
     promiss.then (editor) ->
       editor.insertText(self.allMacrosToString())
-
-  ###
-  last_macro_to_string: ->
-    if @keyCaptured
-      atom.beep()
-      return
-
-    if @compiledCommands and @compiledCommands.length > 0
-      result = 'atom-keyboard-macros.user.' + 'methodName' + ': ->\n'
-      result += @macro_to_string(@compiledCommands)
-      console.log('macro: ', result)
-    else
-      atom.beep()
-  ###
-
 
 
   #
@@ -316,18 +304,6 @@ module.exports = AtomKeyboardMacros =
     cmd = 'atom-keyboard-macros.user:' + name
     editor = atom.workspace.getActiveTextEditor()
     atom.commands.dispatch(atom.views.getView(editor), cmd)
-
-  ###
-  onLineInput: (text) ->
-    if @runningName_last_kbd_macro
-      @name_last_kbd_macro_with_string(text)
-    else if @runningExecute_named_macro
-      @execute_named_macro_with_string(text)
-
-    @runningName_last_kbd_macro = false
-    @runningExecute_named_macro = false
-    @oneLineInputPanel.hide()
-  ###
 
   #
   # call last macro
