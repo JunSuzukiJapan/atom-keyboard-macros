@@ -107,7 +107,6 @@ module.exports = AtomKeyboardMacros =
   newHandleKeyboardEvent: (e) ->
     if e.target?.className?.indexOf('editor mini') >= 0
       return
-    console.log('className', e.target?.className)
     @keySequence.push(e)
 
   #

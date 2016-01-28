@@ -25,6 +25,15 @@ class Compiler
       else
         @parseFindAndReplaceEvent(e)
 
+    index = @result.length - 1
+    console.log('index', index)
+    while index >= 0
+      e = @result[index--]
+      if e.constructor.name == 'KeydownCommand'
+        @result.pop()
+      else
+        break
+
     @result
 
   parseFindAndReplaceEvent: (e) ->

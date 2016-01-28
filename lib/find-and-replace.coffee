@@ -20,11 +20,6 @@ class FindAndReplace
   isRecording: false
 
   activate: ->
-    # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
-    #@subscriptions = new CompositeDisposable
-    #@subscriptions.add atom.commands.add 'atom-workspace',
-    #  'find-and-replace:toggle': => @toggleMonitor
-
     # wake up find-and-replace
     editorElement = atom.views.getView(atom.workspace.getActiveTextEditor())
     atom.commands.dispatch(editorElement, 'find-and-replace:toggle') # wake up if not active
@@ -34,7 +29,22 @@ class FindAndReplace
     @getFindAndReplaceMethods()
 
   deactivate: ->
-    #@subscriptions.dispose()
+    panels = atom.workspace.getBottomPanels()
+
+    for panel in panels
+      item = panel.item
+      name = item?.__proto__?.constructor?.name
+      if name == 'FindView'
+        item.findNext = @findNext
+        item.findPrevious = @findPrevious
+        item.findNextSelected = @findNextSelected
+        item.findPreviousSelected = @findPreviousSelected
+        item.setSelectionAsFindPattern = @setSelectionAsFindPattern
+        item.replaceNext = @replaceNext
+        item.replaceAll = @replaceAll
+
+    @replaceAllButton.removeEventListener('on', @replaceAllButtonHook)
+
 
   #
   # get Methods from FindView
@@ -71,17 +81,6 @@ class FindAndReplace
         @selectionOptionButton = item.selectionOptionButton
         @wholeWordOptionButton = item.wholeWordOptionButton
 
-        ###
-        console.log('findNext', @findNext)
-        console.log('findPrevious', @findPrevious)
-        console.log('findNextSelected', @findNextSelected)
-        console.log('findPreviousSelected', @findPreviousSelected)
-        console.log('setSelectionAsFindPattern', @setSelectionAsFindPattern)
-        console.log('replacePrevious', @replacePrevious)
-        console.log('replaceNext', @replaceNext)
-        console.log('replaceAll', @replaceAll)
-        ###
-
         if !(@findNext and @findPrevious and @findNextSelected and @findPrevious and @findPreviousSelected and @setSelectionAsFindPattern and @replacePrevious and @replaceNext and @replaceAll and @findEditor and @replaceEditor)
           @findNext = null
           @findPrevious = null
@@ -105,11 +104,11 @@ class FindAndReplace
         item.replaceAll = @replaceAllMonitor
 
         self = this
-        @replaceAllButton.on 'click', (e) ->
+        @replaceAllButtonHook = (e) ->
           self.replaceAllMonitor()
+        @replaceAllButton.on 'click', @replaceAllButtonHook
 
-
-        console.log('item',item)
+        #console.log('item',item)
 
         break
 

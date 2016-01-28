@@ -185,7 +185,7 @@ class DispatchCommand
     if !MacroCommand.viewInitialized
       result += tabs + 'editor = atom.workspace.getActiveTextEditor()\n'
       result += tabs + 'view = atom.views.getView(editor)\n'
-      DispatchCommand.viewInitialized = true
+      MacroCommand.viewInitialized = true
     result += tabs + 'atom.commands.dispatch(view, "' + @command_name + '")\n'
     result
 
