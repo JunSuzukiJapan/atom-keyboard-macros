@@ -79,6 +79,7 @@ module.exports = AtomKeyboardMacros =
     @find.activate()
 
   deactivate: ->
+    @find.deactivate()
     @oneLineInputPanel.destroy()
     @oneLineInputView.destroy()
     @repeatCountPanel.destroy()
