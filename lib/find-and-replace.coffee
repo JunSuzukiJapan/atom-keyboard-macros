@@ -65,7 +65,6 @@ class FindAndReplace
       item = panel.item
       name = item?.__proto__?.constructor?.name
       if name == 'FindView'
-        #console.log('item', item)
         @findView = item
 
         @findNext = item.findNext
@@ -159,7 +158,6 @@ class FindAndReplace
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindNextCommand(this, @getFindText(), options))
-    #@macroSequence.push(new FindNextCommand(this, @getFindText()))
 
   #findPrevious: (options={focusEditorAfter: false}) =>
   findPreviousMonitor: ->
@@ -167,7 +165,6 @@ class FindAndReplace
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindPreviousCommand(this, @getFindText(), options))
-    #@macroSequence.push(new FindPreviousCommand(this, @getFindText()))
 
   # findNextSelected: =>
   findNextSelectedMonitor: ->
