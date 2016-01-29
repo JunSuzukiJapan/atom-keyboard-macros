@@ -121,7 +121,6 @@ module.exports = AtomKeyboardMacros =
     @keySequence = []
     @keyCaptured = true
     window.addEventListener('keydown', @eventListener, true)
-    #@find.getFindAndReplaceMethods()
     @find.startRecording(@keySequence)
 
   #
@@ -168,7 +167,6 @@ module.exports = AtomKeyboardMacros =
 
     for cmd in cmds
       result += cmd.toString(tabs)
-    #console.log('result ', result)
     result
 
   allMacrosToString: ->
@@ -176,7 +174,6 @@ module.exports = AtomKeyboardMacros =
     for name, cmds of @table
       str += '  ' + name + ': ->\n'
       str += @macro_to_string(cmds) + '\n'
-    #console.log('macros \n', str)
     str
 
   all_macros_to_new_text_editor: ->
@@ -228,7 +225,6 @@ module.exports = AtomKeyboardMacros =
     ___self = this
     fs.exists @quick_save_dirname, (exists) ->
       if !exists
-        #console.log('savedir ', ___self.quick_save_dirname)
         fs.mkdirSync ___self.quick_save_dirname
       ___self.save_as ___self.quick_save_filename
 
@@ -241,7 +237,6 @@ module.exports = AtomKeyboardMacros =
     _self = this
     @ask_filename (name) ->
       fullpath = _self.macro_dirname + name
-      #console.log('load: ', fullpath)
       _self.load_with_name fullpath
       _self.oneLineInputPanel.hide()
 
@@ -253,7 +248,6 @@ module.exports = AtomKeyboardMacros =
       else
         macros = MacroCommand.loadStringAsMacroCommands text, self.find
         for name, cmds of macros
-          #console.log('name: ', name, ', cmds: ', cmds)
           self.addNamedMacroTable(name, cmds)
 
   # quick_load

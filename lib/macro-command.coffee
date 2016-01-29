@@ -173,8 +173,6 @@ class MacroCommand
               when 'FNDPRV'
                 line = lines[index++]
                 editText = line.substring(3)
-                #options = {} # TODO: set options
-                #cmds.push(new FindPreviousCommand(findAndReplace, editText, options))
                 line = lines[index++].substring(3)
                 opts = line.split(',')
                 useRegex = opts[0].indexOf('true') >= 0
@@ -191,8 +189,6 @@ class MacroCommand
               when 'FNDPRV'
                 line = lines[index++]
                 editText = line.substring(3)
-                #options = {} # TODO: set options
-                #cmds.push(new FindNextCommand(findAndReplace, editText, options))
                 line = lines[index++].substring(3)
                 opts = line.split(',')
                 useRegex = opts[0].indexOf('true') >= 0

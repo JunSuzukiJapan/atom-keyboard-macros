@@ -8,14 +8,6 @@ class FindAndReplace
   findEditor: null
   replaceEditor: null
 
-  ###
-  regexOption: false
-  caseSensitive: false
-  inCurrentSelection: false
-  wholeWord: false
-  ###
-
-  #toggle: ->
   findNext: null
   findPrevious: null
   findNextSelected: null
@@ -131,24 +123,6 @@ class FindAndReplace
           self.findNextMonitor()
         @nextButton.on 'click', @nextButtonHook
 
-        ###
-        @regexOptionButtonHook = (e) ->
-          self.regexOptionButtonMonitor()
-        @regexOptionButton.on 'click', @regexOptionButtonHook
-
-        @caseOptionButtonHook = (e) ->
-          self.caseOptionButtonMonitor()
-        @caseOptionButton.on 'click', @caseOptionButtonHook
-
-        @selectionOptionButtonHook = (e) ->
-          self.selectionOptionButtonMonitor()
-        @selectionOptionButton.on 'click', @selectionOptionButtonHook
-
-        @wholeWordOptionButtonHook = (e) ->
-          self.wholeWordOptionButtonMonitor()
-        @wholeWordOptionButton.on 'click', @wholeWordOptionButtonHook
-        ###
-
         break
 
   # Util
@@ -175,34 +149,11 @@ class FindAndReplace
   stopRecording: ->
     @isRecording = false
 
-  ###
-  #
-  # hook option buttons on change
-  #
-  regexOptionButtonMonitor: ->
-    options = @findView.model?.getFindOptions()
-    @regexOption = options?.useRegex
-
-  caseOptionButtonMonitor: ->
-    options = @findView.model?.getFindOptions()
-    @caseSensitive = options?.caseSensitive
-
-  selectionOptionButtonMonitor: ->
-    options = @findView.model?.getFindOptions()
-    @inCurrentSelection = options?.inCurrentSelection
-
-  wholeWordOptionButtonMonitor: ->
-    options = @findView.model?.getFindOptions()
-    @wholeWord = options.wholeWord
-  ###
-
-
   #
   # hook handlers
   #
 
   # findNext: (options={focusEditorAfter: false}) =>
-  #findNextMonitor: (options={focusEditorAfter: false}) ->
   findNextMonitor: ->
     if not @isRecording
       return
@@ -211,7 +162,6 @@ class FindAndReplace
     #@macroSequence.push(new FindNextCommand(this, @getFindText()))
 
   #findPrevious: (options={focusEditorAfter: false}) =>
-  #findPreviousMonitor: (options={focusEditorAfter: false}) ->
   findPreviousMonitor: ->
     if not @isRecording
       return
