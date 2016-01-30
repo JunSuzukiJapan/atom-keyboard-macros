@@ -111,16 +111,19 @@ class FindAndReplace
 
         self = this
         @replaceAllButtonHook = (e) ->
+          #self.replaceAll()
           self.replaceAllMonitor()
         @replaceAllButton.on 'click', @replaceAllButtonHook
 
         @replaceNextButtonHook = (e) ->
+          #self.replaceNext()
           self.replaceNextMonitor()
         @replaceNextButton.on 'click', @replaceNextButtonHook
 
         @nextButtonHook = (e) ->
+          self.findNext()
           self.findNextMonitor()
-        @nextButton.on 'click', @nextButtonHook
+        @nextButton.on 'click.atom-keyboard-macros', @nextButtonHook
 
         break
 
