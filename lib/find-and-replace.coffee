@@ -43,6 +43,7 @@ class FindAndReplace
         item.replaceNext = @replaceNext
         item.replaceAll = @replaceAll
 
+    ###
     @replaceAllButton.removeEventListener('on', @replaceAllButtonHook)
     @replaceNextButton.removeEventListener('on', @replaceNextButtonHook)
     @nextButton.removeEventListener('on', @nextButtonHook)
@@ -50,7 +51,11 @@ class FindAndReplace
     @caseOptionButton.removeEventListener('on', @caseOptionButtonHook)
     @selectionOptionButton.removeEventListener('on', @selectionOptionButtonHook)
     @wholeWordOptionButton.removeEventListener('on', @wholeWordOptionButtonHook)
+    ###
 
+    @replaceAllButton.off 'click.atom-keyboard-macros'
+    @replaceNextButton.off 'click.atom-keyboard-macros'
+    @nextButton.off 'click.atom-keyboard-macros'
 
   #
   # get Methods from FindView
@@ -113,12 +118,12 @@ class FindAndReplace
         @replaceAllButtonHook = (e) ->
           #self.replaceAll()
           self.replaceAllMonitor()
-        @replaceAllButton.on 'click', @replaceAllButtonHook
+        @replaceAllButton.on 'click.atom-keyboard-macros', @replaceAllButtonHook
 
         @replaceNextButtonHook = (e) ->
           #self.replaceNext()
           self.replaceNextMonitor()
-        @replaceNextButton.on 'click', @replaceNextButtonHook
+        @replaceNextButton.on 'click.atom-keyboard-macros', @replaceNextButtonHook
 
         @nextButtonHook = (e) ->
           self.findNext()

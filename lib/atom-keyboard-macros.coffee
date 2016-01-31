@@ -123,6 +123,9 @@ module.exports = AtomKeyboardMacros =
     window.addEventListener('keydown', @eventListener, true)
     @find.startRecording(@keySequence)
 
+    workspaceElement = atom.views.getView(atom.workspace)
+    workspaceElement.focus()
+
   #
   # stop recording keyboard macros
   #
@@ -140,6 +143,9 @@ module.exports = AtomKeyboardMacros =
     @execute_macro_commands @compiledCommands
 
   execute_macro_commands: (cmds) ->
+    workspaceElement = atom.views.getView(atom.workspace)
+    workspaceElement.focus()
+
     for cmd in cmds
       cmd.execute()
 
