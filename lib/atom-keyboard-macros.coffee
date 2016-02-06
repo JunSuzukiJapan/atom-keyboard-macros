@@ -194,7 +194,7 @@ module.exports = AtomKeyboardMacros =
   #
   ask_filename: (callback) ->
     @oneLineInputPanel.show()
-    @oneLineInputView.input.focus()
+    @oneLineInputView.focus()
     window.addEventListener('keydown', @escapeListener, true)
     @oneLineInputView.setCallback (e) ->
       callback e
@@ -266,7 +266,7 @@ module.exports = AtomKeyboardMacros =
   name_last_kbd_macro: ->
     @runningName_last_kbd_macro = true
     @oneLineInputPanel.show()
-    @oneLineInputView.input.focus()
+    @oneLineInputView.focus()
     window.addEventListener('keydown', @escapeListener, true)
     self = this
     @oneLineInputView.setCallback (text) ->
@@ -290,7 +290,7 @@ module.exports = AtomKeyboardMacros =
   execute_named_macro: ->
     @runningExecute_named_macro = true
     @oneLineInputPanel.show()
-    @oneLineInputView.input.focus()
+    @oneLineInputView.focus()
     window.addEventListener('keydown', @escapeListener, true)
     self = this
     @oneLineInputView.setCallback (text) ->
@@ -333,7 +333,7 @@ module.exports = AtomKeyboardMacros =
       return
 
     @repeatCountPanel.show()
-    @repeatCountView.input.focus()
+    @repeatCountView.focus()
     window.addEventListener('keydown', @escapeListener, true)
     self = this
     @repeatCountView.setCallback (count) ->

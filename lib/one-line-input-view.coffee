@@ -1,6 +1,11 @@
+{TextEditor} = require 'atom'
+
 module.exports =
 class OneLineInputView
   callback: null
+  element: null
+  editorElement: null
+  input: null
 
   constructor: (serializedState) ->
     # Create root element
@@ -14,17 +19,21 @@ class OneLineInputView
         self.callback(self.input.value)
     @element.appendChild(form)
 
-    @input = document.createElement('input')
-    @input.type = 'text'
+    @editorElement = document.createElement('atom-text-editor')
+    @input = document.createElement('subview')
+    elem = document.createElement('div')
+    editor = atom.workspace.buildTextEditor({mini: true, lineNumberGutterVisible: false})
+    @editorElement.setModel(editor)
+    elem.appendChild(@editorElement)
+    @input.appendChild(elem)
     @input.onkeydown = (e) ->
       if e.keyIdentifier == 'Enter' and self.callback
-        self.callback(self.input.value)
+        value = self.input.value
+        self.callback(value)
     form.appendChild(@input)
 
-    button = document.createElement('button')
-    button.textContent ='OK'
-    button.type = 'submit'
-    form.appendChild(button)
+  focus: ->
+    @editorElement.focus()
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->
