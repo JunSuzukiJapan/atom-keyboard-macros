@@ -22,7 +22,11 @@ class OneLineInputView
     @editorElement = document.createElement('atom-text-editor')
     @input = document.createElement('subview')
     elem = document.createElement('div')
-    editor = atom.workspace.buildTextEditor({mini: true, lineNumberGutterVisible: false})
+    editor = atom.workspace.buildTextEditor({
+      mini: true,
+      lineNumberGutterVisible: false,
+      placeholderText: 'Macro name'
+    })
     @editorElement.setModel(editor)
     elem.appendChild(@editorElement)
     @input.appendChild(elem)
