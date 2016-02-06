@@ -12,13 +12,6 @@ class OneLineInputView
     @element = document.createElement('div')
     @element.classList.add('atom-keyboard-macros')
 
-    form = document.createElement('form')
-    self = this
-    form.onsubmit = (e) ->
-      if self.callback
-        self.callback(self.input.value)
-    @element.appendChild(form)
-
     @editorElement = document.createElement('atom-text-editor')
     @input = document.createElement('subview')
     elem = document.createElement('div')
@@ -30,11 +23,12 @@ class OneLineInputView
     @editorElement.setModel(editor)
     elem.appendChild(@editorElement)
     @input.appendChild(elem)
+    self = this
     @input.onkeydown = (e) ->
       if e.keyIdentifier == 'Enter' and self.callback
         value = self.input.value
         self.callback(value)
-    form.appendChild(@input)
+    @element.appendChild(@input)
 
   focus: ->
     @editorElement.focus()
