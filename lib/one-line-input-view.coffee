@@ -18,9 +18,9 @@ class OneLineInputView
     @editorElement.setModel(editor)
     self = this
     @editorElement.onkeydown = (e) ->
-      if e.keyIdentifier == 'Enter' and self.callback
+      if e.keyIdentifier == 'Enter'
         value = self.editorElement.value
-        self.callback(value)
+        self.callback?(value)
     @element.appendChild(@editorElement)
 
   focus: ->
