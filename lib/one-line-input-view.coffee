@@ -13,22 +13,18 @@ class OneLineInputView
     @element.classList.add('atom-keyboard-macros')
 
     @editorElement = document.createElement('atom-text-editor')
-    @input = document.createElement('subview')
-    elem = document.createElement('div')
     editor = atom.workspace.buildTextEditor({
       mini: true,
       lineNumberGutterVisible: false,
       placeholderText: 'Macro name'
     })
     @editorElement.setModel(editor)
-    elem.appendChild(@editorElement)
-    @input.appendChild(elem)
     self = this
-    @input.onkeydown = (e) ->
+    @editorElement.onkeydown = (e) ->
       if e.keyIdentifier == 'Enter' and self.callback
-        value = self.input.value
+        value = self.editorElement.value
         self.callback(value)
-    @element.appendChild(@input)
+    @element.appendChild(@editorElement)
 
   focus: ->
     @editorElement.focus()
