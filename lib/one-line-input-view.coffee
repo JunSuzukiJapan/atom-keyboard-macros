@@ -1,5 +1,3 @@
-{TextEditor} = require 'atom'
-
 module.exports =
 class OneLineInputView
   callback: null
