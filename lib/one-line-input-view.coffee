@@ -5,7 +5,6 @@ class OneLineInputView
   callback: null
   element: null
   editorElement: null
-  input: null
 
   constructor: (serializedState) ->
     # Create root element
