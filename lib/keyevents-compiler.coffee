@@ -47,7 +47,7 @@ class Compiler
         @result.push(new InputTextCommand(@seq))
 
       stroke = keystrokeForKeyboardEvent(e)
-      if keystroke.length == 0
+      if @keystroke.length == 0
         @keystroke = stroke
       else
         @keystroke = @keystroke + ' ' + stroke
