@@ -1,6 +1,7 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 RepeatCountView = require './repeat-count-view'
 OneLineInputView = require './one-line-input-view'
+MacroNameSelectListView = require './macro-name-select-list-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
 Compiler = require './keyevents-compiler'
@@ -15,6 +16,7 @@ module.exports = AtomKeyboardMacros =
   repeatCountPanel: null
   oneLineInputView: null
   oneLineInputPanel: null
+  macroNamesSelectListView: null
   subscriptions: null
 
   keyCaptured: false
@@ -48,6 +50,8 @@ module.exports = AtomKeyboardMacros =
     @oneLineInputView = new OneLineInputView(state.oneLineInputViewState)
     @oneLineInputPanel = atom.workspace.addModalPanel(item: @oneLineInputView.getElement(), visible: false)
 
+    @macroNamesSelectListView = new MacroNameSelectListView(state.macroNamesSelectListViewState)
+
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
 
@@ -80,6 +84,7 @@ module.exports = AtomKeyboardMacros =
 
   deactivate: ->
     @find.deactivate()
+    @macroNamesSelectListView.destroy()
     @oneLineInputPanel.destroy()
     @oneLineInputView.destroy()
     @repeatCountPanel.destroy()
@@ -158,10 +163,13 @@ module.exports = AtomKeyboardMacros =
     self = this
     @table[name] = commands
 
+    @macroNamesSelectListView.addItem name
+
     # remove old command if exists
     prevCommand = atom.commands.selectorBasedListenersByCommandName['atom-keyboard-macros.user:' + name]
     if prevCommand
       atom.commands.selectorBasedListenersByCommandName['atom-keyboard-macros.user:' + name] = null
+
     # add new command
     atom.commands.add 'atom-workspace', ('atom-keyboard-macros.user:' + name), ->
       self.execute_macro_commands commands
@@ -289,13 +297,15 @@ module.exports = AtomKeyboardMacros =
   #
   execute_named_macro: ->
     @runningExecute_named_macro = true
-    @oneLineInputPanel.show()
-    @oneLineInputView.focus()
+    #@oneLineInputPanel.show()
+    #@oneLineInputView.focus()
+    @macroNamesSelectListView.show()
     window.addEventListener('keydown', @escapeListener, true)
     self = this
-    @oneLineInputView.setCallback (text) ->
+    #@oneLineInputView.setCallback (text) ->
+    @macroNamesSelectListView.setCallback (text) ->
       self.execute_named_macro_with_string(text)
-      self.oneLineInputPanel.hide()
+      #self.oneLineInputPanel.hide()
 
   execute_named_macro_with_string: (name) ->
     if @keyCaptured
