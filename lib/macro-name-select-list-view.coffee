@@ -10,14 +10,6 @@ class MacroNameSelectListView extends SelectListView
   initialize: (@listOfItems) ->
     super
     @setItems(@listOfItems)
-    self = this
-    #@element.onkeydown = (e) ->
-      #if e.keyIdentifier == 'Enter'
-      #  value = self.filterEditorView.getText()
-      #  param = {name: value}
-      #  self.confirmed?(param)
-      #if e.keyIdentifier == 'Escape'
-      #  self.cancel()
 
   show: ->
     @panel ?= atom.workspace.addModalPanel(item: this)
@@ -37,10 +29,18 @@ class MacroNameSelectListView extends SelectListView
   hide: ->
     @panel?.hide()
 
+  existsItem: (item) ->
+    for obj in @items
+      if obj.name == item
+        #atom.beep()
+        return true
+    false
+
   addItem: (item) ->
     @items ?= []
-    @items.push
-      name: item
+    unless @existsItem item
+      @items.push
+        name: item
 
     @setItems @items
 
@@ -66,11 +66,6 @@ class MacroNameSelectListView extends SelectListView
   getFilterKey: ->
     'name'
 
-  #viewForItem: (item) ->
-  #  console.log('viewForItem', item)
-  #  $$ -> @li(item)
-
-  #viewForItem: ({name, displayName, eventDescription}) ->
   viewForItem: ({name}) ->
     # Style matched characters in search results
     filterQuery = @getFilterQuery()
@@ -78,6 +73,7 @@ class MacroNameSelectListView extends SelectListView
       matches = fuzzaldrinPlus.match(name, filterQuery)
     else
       matches = match(name, filterQuery)
+    matches = match(name, filterQuery)
 
     $$ ->
       highlighter = (command, matches, offsetIndex) =>
@@ -101,9 +97,6 @@ class MacroNameSelectListView extends SelectListView
         @text command.substring(lastIndex)
 
       @li class: 'event', 'data-event-name': name, =>
-        #@div class: 'pull-right', =>
-        #  for binding in keyBindings when binding.command is name
-        #    @kbd _.humanizeKeystroke(binding.keystrokes), class: 'key-binding'
         @span title: name, -> highlighter(name, matches, 0)
 
   populateList: ->

@@ -222,6 +222,9 @@ module.exports = AtomKeyboardMacros =
         #console.log('save: ', fullpath)
         _self.save_as fullpath
         _self.oneLineInputPanel.hide()
+        # focus TextEditor
+        editor = atom.workspace.getActiveTextEditor()
+        atom.views.getView(editor).focus()
 
   save_as: (filename) ->
     str = ''
@@ -253,6 +256,9 @@ module.exports = AtomKeyboardMacros =
       fullpath = _self.macro_dirname + name
       _self.load_with_name fullpath
       _self.oneLineInputPanel.hide()
+      # focus TextEditor
+      editor = atom.workspace.getActiveTextEditor()
+      atom.views.getView(editor).focus()
 
   load_with_name: (name) ->
     self = this
@@ -280,7 +286,9 @@ module.exports = AtomKeyboardMacros =
     @oneLineInputView.setCallback (text) ->
       self.name_last_kbd_macro_with_string(text)
       self.oneLineInputPanel.hide()
-
+      # focus TextEditor
+      editor = atom.workspace.getActiveTextEditor()
+      atom.views.getView(editor).focus()
 
   name_last_kbd_macro_with_string: (name) ->
     if @keyCaptured
@@ -297,15 +305,11 @@ module.exports = AtomKeyboardMacros =
   #
   execute_named_macro: ->
     @runningExecute_named_macro = true
-    #@oneLineInputPanel.show()
-    #@oneLineInputView.focus()
     @macroNamesSelectListView.show()
     window.addEventListener('keydown', @escapeListener, true)
     self = this
-    #@oneLineInputView.setCallback (text) ->
     @macroNamesSelectListView.setCallback (text) ->
       self.execute_named_macro_with_string(text)
-      #self.oneLineInputPanel.hide()
 
   execute_named_macro_with_string: (name) ->
     if @keyCaptured
