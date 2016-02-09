@@ -8,6 +8,8 @@ Compiler = require './keyevents-compiler'
 {MacroCommand, DispatchCommand} = require './macro-command'
 fs = require 'fs'
 FindAndReplace = require './find-and-replace'
+BaseSelectListView = require './base-select-list-view'
+FilenameSelectListModel = require './filename-select-list-model'
 
 module.exports = AtomKeyboardMacros =
   atomKeyboardMacrosView: null
@@ -34,6 +36,9 @@ module.exports = AtomKeyboardMacros =
   quick_save_filename: null
   macro_dirname: null
 
+  baseSelectListView: null
+  filename_select_list_model: null
+
   find: null
 
   activate: (state) ->
@@ -51,6 +56,9 @@ module.exports = AtomKeyboardMacros =
     @oneLineInputPanel = atom.workspace.addModalPanel(item: @oneLineInputView.getElement(), visible: false)
 
     @macroNamesSelectListView = new MacroNameSelectListView(state.macroNamesSelectListViewState)
+
+    @filename_select_list_model = new FilenameSelectListModel(@macro_dirname)
+    @baseSelectListView = new BaseSelectListView(state.baseSelectListViewState, @filename_select_list_model)
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
@@ -201,11 +209,9 @@ module.exports = AtomKeyboardMacros =
   # file Util
   #
   ask_filename: (callback) ->
-    @oneLineInputPanel.show()
-    @oneLineInputView.focus()
-    window.addEventListener('keydown', @escapeListener, true)
-    @oneLineInputView.setCallback (e) ->
+    @baseSelectListView.setCallback (e) ->
       callback e
+    @baseSelectListView.show()
 
   #
   # save
