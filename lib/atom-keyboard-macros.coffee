@@ -17,9 +17,7 @@ module.exports = AtomKeyboardMacros =
   repeatCountView: null
   repeatCountPanel: null
   oneLineInputView: null
-  oneLineInputPanel: null
   saveFilenameInputView: null
-  saveFilenameInputPanel: null
   subscriptions: null
 
   keyCaptured: false
@@ -55,10 +53,7 @@ module.exports = AtomKeyboardMacros =
     @repeatCountPanel = atom.workspace.addModalPanel(item: @repeatCountView.getElement(), visible: false)
 
     @oneLineInputView = new OneLineInputView(state.oneLineInputViewState)
-    @oneLineInputPanel = atom.workspace.addModalPanel(item: @oneLineInputView.getElement(), visible: false)
-
     @saveFilenameInputView = new OneLineInputView(state.saveFilenameInputViewState, 'Save filename')
-    @saveFilenameInputPanel = atom.workspace.addModalPanel(item: @saveFilenameInputView.getElement(), visible: false)
 
     @macronames_select_list_model = new MacroNameSelectListModel()
     @macroNamesSelectListView = new BaseSelectListView(state.macroNamesSelectListViewState, @macronames_select_list_model)
@@ -98,9 +93,7 @@ module.exports = AtomKeyboardMacros =
 
   deactivate: ->
     @find.deactivate()
-    @saveFilenameInputPanel.destroy()
     @saveFilenameInputView.destroy()
-    @oneLineInputPanel.destroy()
     @oneLineInputView.destroy()
     @repeatCountPanel.destroy()
     @repeatCountView.destroy()
@@ -223,8 +216,7 @@ module.exports = AtomKeyboardMacros =
   ask_save_filename: (callback) ->
     @saveFilenameInputView.setCallback (e) ->
       callback e
-    @saveFilenameInputPanel.show()
-    @saveFilenameInputView.focus()
+    @saveFilenameInputView.show()
 
   #
   # save
@@ -239,7 +231,6 @@ module.exports = AtomKeyboardMacros =
       _self.ask_save_filename (name) ->
         fullpath = _self.macro_dirname + name
         _self.save_as fullpath
-        _self.saveFilenameInputPanel.hide()
         # focus TextEditor
         editor = atom.workspace.getActiveTextEditor()
         atom.views.getView(editor).focus()
@@ -296,13 +287,10 @@ module.exports = AtomKeyboardMacros =
   #
   name_last_kbd_macro: ->
     @runningName_last_kbd_macro = true
-    @oneLineInputPanel.show()
-    @oneLineInputView.focus()
-    window.addEventListener('keydown', @escapeListener, true)
+    @oneLineInputView.show()
     self = this
     @oneLineInputView.setCallback (text) ->
       self.name_last_kbd_macro_with_string(text)
-      self.oneLineInputPanel.hide()
       # focus TextEditor
       editor = atom.workspace.getActiveTextEditor()
       atom.views.getView(editor).focus()
@@ -375,7 +363,7 @@ module.exports = AtomKeyboardMacros =
     if keystroke == 'escape'
       @escapeKeyPressed = true
       @repeatCountPanel.hide()
-      @oneLineInputPanel.hide()
+      @oneLineInputView.hide()
       window.removeEventListener('keydown', @escapeListener, true)
 
 

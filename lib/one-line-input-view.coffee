@@ -22,8 +22,24 @@ class OneLineInputView
       if e.keyIdentifier == 'Enter'
         value = self.editor.getText()
         self.clearText()
+        self.hide()
         self.callback?(value)
     @element.appendChild(@editorElement)
+
+  show: ->
+    @panel ?= atom.workspace.addModalPanel(item: @element)
+    @panel.show()
+    window.addEventListener('keydown', @escapeListener, true)
+    @focus()
+
+  hide: ->
+    @panel.hide()
+
+  escapeListener: (e) =>
+    keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
+    if keystroke == 'escape'
+      @hide()
+      window.removeEventListener('keydown', @escapeListener, true)
 
   focus: ->
     @editorElement.focus()
