@@ -126,7 +126,6 @@ module.exports = AtomKeyboardMacros =
 
   # @eventListener
   newHandleKeyboardEvent: (e) ->
-    console.log('newHandleKeyboardEvent')
     if e.target?.className?.indexOf('editor mini') >= 0
       return
     @keySequence.push(e)
@@ -372,7 +371,6 @@ module.exports = AtomKeyboardMacros =
       self.onGetRepeatCount(count)
 
   onEscapeKey: (e) ->
-    console.log('onEscapeKey')
     keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
     if keystroke == 'escape'
       @escapeKeyPressed = true
