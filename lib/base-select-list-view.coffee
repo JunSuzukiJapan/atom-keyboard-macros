@@ -47,21 +47,8 @@ class BaseSelectListView extends SelectListView
 
     @focusFilterEditor()
 
-    #window.addEventListener('keydown', @keyListener, true)
-
-  ###
-  keyListener: (e) =>
-    keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
-    if keystroke == 'enter'
-      text = @filterEditorView.getText()
-      param =
-        name: text
-      @confirmed(param)
-  ###
-
   hide: ->
     @panel?.hide()
-    #window.removeEventListener('keydown', @keyListener, true)
 
   addItem: (item) ->
     @model.addItem item
