@@ -5,7 +5,7 @@ class OneLineInputView
   editorElement: null
   editor: null
 
-  constructor: (serializedState) ->
+  constructor: (serializedState, placeholderText = 'Macro name') ->
     # Create root element
     @element = document.createElement('div')
     @element.classList.add('atom-keyboard-macros')
@@ -14,7 +14,7 @@ class OneLineInputView
     @editor = atom.workspace.buildTextEditor({
       mini: true,
       lineNumberGutterVisible: false,
-      placeholderText: 'Macro name'
+      placeholderText: placeholderText
     })
     @editorElement.setModel(@editor)
     self = this

@@ -8,11 +8,27 @@ class BaseSelectListView extends SelectListView
   panel: null
   callback: null
 
+  @config:
+    useAlternateScoring:
+      type: 'boolean'
+      default: true
+      description: 'Use an alternative scoring approach which prefers run of consecutive characters, acronyms and start of words. (Experimental)'
+
+  @activate: ->
+
+  @deactivate: ->
+    @scoreSubscription?.dispose()
+
   constructor: (state, @model) ->
     super state
 
   initialize: (@listOfItems) ->
     super
+
+    @alternateScoring = atom.config.get 'atom-keyboard-macros.useAlternateScoring'
+    @scoreSubscription = atom.config.onDidChange 'atom-keyboard-macros.useAlternateScoring', ({newValue}) => @alternateScoring = newValue
+
+    @addClass('atom-keyboard-macros')
     @setItems @listOfItems
 
   show: ->
@@ -31,19 +47,21 @@ class BaseSelectListView extends SelectListView
 
     @focusFilterEditor()
 
-    window.addEventListener('keydown', @escapeListener, true)
+    #window.addEventListener('keydown', @keyListener, true)
 
-  escapeListener: (e) =>
+  ###
+  keyListener: (e) =>
     keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
     if keystroke == 'enter'
       text = @filterEditorView.getText()
       param =
         name: text
       @confirmed(param)
+  ###
 
   hide: ->
     @panel?.hide()
-    window.removeEventListener('keydown', @escapeListener, true)
+    #window.removeEventListener('keydown', @keyListener, true)
 
   addItem: (item) ->
     @model.addItem item

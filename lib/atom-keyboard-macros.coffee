@@ -1,7 +1,6 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 RepeatCountView = require './repeat-count-view'
 OneLineInputView = require './one-line-input-view'
-MacroNameSelectListView = require './macro-name-select-list-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
 Compiler = require './keyevents-compiler'
@@ -9,6 +8,7 @@ Compiler = require './keyevents-compiler'
 fs = require 'fs'
 FindAndReplace = require './find-and-replace'
 BaseSelectListView = require './base-select-list-view'
+MacroNameSelectListModel = require './macro-name-select-list-model'
 FilenameSelectListModel = require './filename-select-list-model'
 
 module.exports = AtomKeyboardMacros =
@@ -18,7 +18,8 @@ module.exports = AtomKeyboardMacros =
   repeatCountPanel: null
   oneLineInputView: null
   oneLineInputPanel: null
-  macroNamesSelectListView: null
+  saveFilenameInputView: null
+  saveFilenameInputPanel: null
   subscriptions: null
 
   keyCaptured: false
@@ -37,6 +38,7 @@ module.exports = AtomKeyboardMacros =
   macro_dirname: null
 
   baseSelectListView: null
+  macronames_select_list_model: null
   filename_select_list_model: null
 
   find: null
@@ -55,7 +57,11 @@ module.exports = AtomKeyboardMacros =
     @oneLineInputView = new OneLineInputView(state.oneLineInputViewState)
     @oneLineInputPanel = atom.workspace.addModalPanel(item: @oneLineInputView.getElement(), visible: false)
 
-    @macroNamesSelectListView = new MacroNameSelectListView(state.macroNamesSelectListViewState)
+    @saveFilenameInputView = new OneLineInputView(state.saveFilenameInputViewState, 'Save filename')
+    @saveFilenameInputPanel = atom.workspace.addModalPanel(item: @saveFilenameInputView.getElement(), visible: false)
+
+    @macronames_select_list_model = new MacroNameSelectListModel()
+    @macroNamesSelectListView = new BaseSelectListView(state.macroNamesSelectListViewState, @macronames_select_list_model)
 
     @filename_select_list_model = new FilenameSelectListModel(@macro_dirname)
     @baseSelectListView = new BaseSelectListView(state.baseSelectListViewState, @filename_select_list_model)
@@ -92,7 +98,8 @@ module.exports = AtomKeyboardMacros =
 
   deactivate: ->
     @find.deactivate()
-    @macroNamesSelectListView.destroy()
+    @saveFilenameInputPanel.destroy()
+    @saveFilenameInputView.destroy()
     @oneLineInputPanel.destroy()
     @oneLineInputView.destroy()
     @repeatCountPanel.destroy()
@@ -119,6 +126,7 @@ module.exports = AtomKeyboardMacros =
 
   # @eventListener
   newHandleKeyboardEvent: (e) ->
+    console.log('newHandleKeyboardEvent')
     if e.target?.className?.indexOf('editor mini') >= 0
       return
     @keySequence.push(e)
@@ -171,7 +179,7 @@ module.exports = AtomKeyboardMacros =
     self = this
     @table[name] = commands
 
-    @macroNamesSelectListView.addItem name
+    @macronames_select_list_model.addItem name
 
     # remove old command if exists
     prevCommand = atom.commands.selectorBasedListenersByCommandName['atom-keyboard-macros.user:' + name]
@@ -213,6 +221,12 @@ module.exports = AtomKeyboardMacros =
       callback e
     @baseSelectListView.show()
 
+  ask_save_filename: (callback) ->
+    @saveFilenameInputView.setCallback (e) ->
+      callback e
+    @saveFilenameInputPanel.show()
+    @saveFilenameInputView.focus()
+
   #
   # save
   #
@@ -223,11 +237,10 @@ module.exports = AtomKeyboardMacros =
     fs.exists @macro_dirname, (exists) ->
       if !exists
         fs.mkdirSync _self.macro_dirname
-      _self.ask_filename (name) ->
+      _self.ask_save_filename (name) ->
         fullpath = _self.macro_dirname + name
-        #console.log('save: ', fullpath)
         _self.save_as fullpath
-        _self.oneLineInputPanel.hide()
+        _self.saveFilenameInputPanel.hide()
         # focus TextEditor
         editor = atom.workspace.getActiveTextEditor()
         atom.views.getView(editor).focus()
@@ -261,7 +274,6 @@ module.exports = AtomKeyboardMacros =
     @ask_filename (name) ->
       fullpath = _self.macro_dirname + name
       _self.load_with_name fullpath
-      _self.oneLineInputPanel.hide()
       # focus TextEditor
       editor = atom.workspace.getActiveTextEditor()
       atom.views.getView(editor).focus()
@@ -312,7 +324,7 @@ module.exports = AtomKeyboardMacros =
   execute_named_macro: ->
     @runningExecute_named_macro = true
     @macroNamesSelectListView.show()
-    window.addEventListener('keydown', @escapeListener, true)
+    #window.addEventListener('keydown', @escapeListener, true)
     self = this
     @macroNamesSelectListView.setCallback (text) ->
       self.execute_named_macro_with_string(text)
@@ -360,6 +372,7 @@ module.exports = AtomKeyboardMacros =
       self.onGetRepeatCount(count)
 
   onEscapeKey: (e) ->
+    console.log('onEscapeKey')
     keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
     if keystroke == 'escape'
       @escapeKeyPressed = true
