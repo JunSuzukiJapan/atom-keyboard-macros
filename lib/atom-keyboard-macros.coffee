@@ -24,7 +24,6 @@ module.exports = AtomKeyboardMacros =
   eventListener: null
   escapeListener: null
   escapeKeyPressed: false
-  keySequence: []
   macroCommands: null
 
   runningName_last_kbd_macro: false
@@ -329,7 +328,6 @@ module.exports = AtomKeyboardMacros =
     if @keyCaptured
       atom.beep()
       return
-    #if !@keySequence || @keySequence.length == 0
     if !@macroCommands || @macroCommands.length == 0
       this.setText('no keyboard macros.')
       return
@@ -346,7 +344,6 @@ module.exports = AtomKeyboardMacros =
     if @keyCaptured
       atom.beep()
       return
-    #if !@keySequence || @keySequence.length == 0
     if !@macroCommands || @macroCommands.length == 0
       this.setText('no keyboard macros.')
       return
