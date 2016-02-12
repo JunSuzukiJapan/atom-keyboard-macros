@@ -3,7 +3,6 @@ RepeatCountView = require './repeat-count-view'
 OneLineInputView = require './one-line-input-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
-#Compiler = require './keyevents-compiler'
 Recorder = require './recorder'
 {MacroCommand, DispatchCommand} = require './macro-command'
 fs = require 'fs'
@@ -26,8 +25,7 @@ module.exports = AtomKeyboardMacros =
   escapeListener: null
   escapeKeyPressed: false
   keySequence: []
-  #compiler: null
-  #compiledCommands: null
+  macroCommands: null
 
   runningName_last_kbd_macro: false
   runningExecute_named_macro: false
@@ -81,14 +79,11 @@ module.exports = AtomKeyboardMacros =
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:load': => @load()
     @subscriptions.add atom.commands.add 'atom-workspace', 'atom-keyboard-macros:all_macros_to_new_text_editor': => @all_macros_to_new_text_editor()
 
-    #@subscriptions.add atom.commands.add 'atom-workspace', 'find-and-replace:replace-all': => @replaceAll()
-
     # make event listener
     @eventListener = @keyboardEventHandler.bind(this)
     @escapeListener = @onEscapeKey.bind(this)
 
     @keyCaptured = false
-    #@compiler = new Compiler()
     @recorder = new Recorder()
     @find = new FindAndReplace()
     @find.activate()
@@ -123,7 +118,6 @@ module.exports = AtomKeyboardMacros =
   keyboardEventHandler: (e) ->
     if e.target?.className?.indexOf('editor mini') >= 0
       return
-    #@keySequence.push(e)
     @recorder.add(e)
 
   #
@@ -134,7 +128,6 @@ module.exports = AtomKeyboardMacros =
     if @keyCaptured
       atom.beep()
       return
-    #@keySequence = []
     @recorder.start()
     @keyCaptured = true
     window.addEventListener('keydown', @eventListener, true)
@@ -151,15 +144,14 @@ module.exports = AtomKeyboardMacros =
     @keyCaptured = false
     this.setText('end recording keyboard macros.')
     @recorder.stop()
-    #@compiledCommands = @compiler.compile(@keySequence)
-    @compiledCommands = @recorder.getSequence()
+    @macroCommands = @recorder.getSequence()
     @find.stopRecording()
 
   #
   # Util method: execute macro once
   #
   execute_macro_once: ->
-    @execute_macro_commands @compiledCommands
+    @execute_macro_commands @macroCommands
 
   execute_macro_commands: (cmds) ->
     workspaceElement = atom.views.getView(atom.workspace)
@@ -306,8 +298,8 @@ module.exports = AtomKeyboardMacros =
       atom.beep()
       return
 
-    if @compiledCommands and @compiledCommands.length > 0
-      @addNamedMacroTable(name, @compiledCommands)
+    if @macroCommands and @macroCommands.length > 0
+      @addNamedMacroTable(name, @macroCommands)
     else
       atom.beep()
 
@@ -338,7 +330,7 @@ module.exports = AtomKeyboardMacros =
       atom.beep()
       return
     #if !@keySequence || @keySequence.length == 0
-    if !@compiledCommands || @compiledCommands.length == 0
+    if !@macroCommands || @macroCommands.length == 0
       this.setText('no keyboard macros.')
       return
 
@@ -355,7 +347,7 @@ module.exports = AtomKeyboardMacros =
       atom.beep()
       return
     #if !@keySequence || @keySequence.length == 0
-    if !@compiledCommands || @compiledCommands.length == 0
+    if !@macroCommands || @macroCommands.length == 0
       this.setText('no keyboard macros.')
       return
 
