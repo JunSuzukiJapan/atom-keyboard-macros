@@ -281,6 +281,9 @@ class InputTextCommand extends MacroCommand
     result
 
 class DispatchCommand
+  constructor: (@command_name) ->
+
+  ###
   constructor: (keystroke) ->
     editor = atom.workspace.getActiveTextEditor()
     view = atom.views.getView(editor)
@@ -294,6 +297,7 @@ class DispatchCommand
         #console.log('bindings', bindings)
         bind = bindings[0]
         @command_name = bind.command
+  ###
 
   execute: ->
     editor = atom.workspace.getActiveTextEditor()
