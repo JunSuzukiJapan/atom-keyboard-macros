@@ -601,6 +601,36 @@ class ReplaceAllCommand extends FRBaseCommand
     result += ':O:' + @useRegex + ',' + @caseSensitive + ',' + @inCurrentSelection + ',' + @wholeWord + '\n'
     result
 
+# Plugin
+class PluginCommand extends MacroCommand
+  constructor: (@plugin, @options) ->
+    super(@options)
+
+  execute: ->
+    @plugin.execute(@options)
+
+  toString: (tabs) ->
+    @plugin.toString(tabs)
+
+  toSaveString: ->
+    @plugin.toSaveString()
+
+  instansiateFromSavedString: (str) ->
+    @plugin.instansiateFromSavedString(str)
+
+###
+# Plugin Interface
+class PluginInterface
+  execute: (@options) ->
+
+  toString: (tabs) ->
+
+  toSaveString: ->
+
+  instansiateFromSavedString: (str) ->
+###
+
+
 module.exports =
     MacroCommand: MacroCommand
     InputTextCommand: InputTextCommand
@@ -614,3 +644,4 @@ module.exports =
     ReplacePreviousCommand: ReplacePreviousCommand
     ReplaceNextCommand: ReplaceNextCommand
     ReplaceAllCommand: ReplaceAllCommand
+    PluginCommand: PluginCommand

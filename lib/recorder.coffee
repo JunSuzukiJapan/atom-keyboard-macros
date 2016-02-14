@@ -54,6 +54,7 @@ class Recorder
 
     else # not text event
       if @currentMode == TextMode and @keySeq.length > 0
+        #console.log('InputTextCommand', @keySeq)
         @sequence.push(new InputTextCommand(@keySeq))
         @keySeq = []
 
@@ -84,8 +85,8 @@ class Recorder
         keystrokes = stroke
 
       keybind = atom.keymaps.findKeyBindings(keystrokes: keystrokes, target: @editorElement)
-      if keybind.indexOf("vim-mode:insert-after") == 0
-        console.log('keystrokes', keystrokes, 'keybind', keybind)
+      #if keybind.indexOf("vim-mode:insert-after") == 0
+      #  console.log('keystrokes', keystrokes, 'keybind', keybind)
       if keybind.length == 0
         continue
 
@@ -97,6 +98,8 @@ class Recorder
         unless command_name.indexOf('atom-keyboard-macros') == 0
           @sequence.push(new DispatchCommand(command_name))
 
+        #console.log('pushDispatchCommand1', command_name, 'TextMode')
         return [[], TextMode]
 
+    #console.log('pushDispatchCommand2', command_name, 'CommandMode')
     [seq, CommandMode]
