@@ -63,7 +63,7 @@ class Recorder
       [@keySeq, @currentMode] = @pushDispatchCommand(@keySeq)
 
 
-  # for find-and-replace
+  # for find-and-replace and plugins
   push: (cmd) ->
     if @currentMode == TextMode and @keySeq.length > 0
       @sequence.push(new InputTextCommand(@keySeq))

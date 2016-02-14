@@ -4,7 +4,7 @@ OneLineInputView = require './one-line-input-view'
 {CompositeDisposable} = require 'atom'
 {normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
 Recorder = require './recorder'
-{MacroCommand, DispatchCommand} = require './macro-command'
+{MacroCommand, DispatchCommand, PluginCommand} = require './macro-command'
 fs = require 'fs'
 FindAndReplace = require './find-and-replace'
 BaseSelectListView = require './base-select-list-view'
@@ -401,3 +401,10 @@ module.exports = AtomKeyboardMacros =
           break
         @execute_macro_once()
       window.removeEventListener('keydown', @escapeListener, true)
+
+  #
+  # Plugins
+  #
+  push_plugin_command: (plugin_obj) ->
+    cmd = new PluginCommand(plugin_obj.fn, plugin_obj.options)
+    @recorder.push cmd
