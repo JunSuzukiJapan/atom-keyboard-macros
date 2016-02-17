@@ -73,7 +73,7 @@ class MacroCommand
             method = lines[2]
             options = lines[3] if lines.length == 4
             targetPackage = atom.packages.getActivePackage(packageName)
-            cmd = targetPackage?[method]?(options)
+            cmd = targetPackage?.mainModule?[method]?(options)
             cmds.push cmd if cmd
 
           when ':'
