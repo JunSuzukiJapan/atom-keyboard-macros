@@ -68,10 +68,10 @@ class MacroCommand
               cmds.push(new KeydownCommand(event))
 
           when 'P'  # Plugins: ex  '*P:atom-keyboard-macros-vim:singleInstansiateFromSavedString:options'
-            lines = line.split(':', 4)
-            packageName = lines[1]
-            method = lines[2]
-            options = lines[3] if lines.length == 4
+            items = line.split(':', 4)
+            packageName = items[1]
+            method = items[2]
+            options = items[3] if items.length == 4
             targetPackage = atom.packages.getActivePackage(packageName)
             cmd = targetPackage?.mainModule?[method]?(options)
             cmds.push cmd if cmd
