@@ -39,6 +39,8 @@ module.exports = AtomKeyboardMacros =
 
   find: null
 
+  PluginCommand: PluginCommand
+
   activate: (state) ->
     @quick_save_dirname = atom.packages.resolvePackagePath('atom-keyboard-macros') + '/__quick/'
     @quick_save_filename = @quick_save_dirname + 'macros.atmkm'

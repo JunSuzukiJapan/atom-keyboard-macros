@@ -67,6 +67,15 @@ class MacroCommand
               event = MacroCommand.keydownEventFromString(s)
               cmds.push(new KeydownCommand(event))
 
+          when 'P'  # Plugins: ex  '*P:atom-keyboard-macros-vim:singleInstansiateFromSavedString:options'
+            lines = line.split(':', 4)
+            packageName = lines[1]
+            method = lines[2]
+            options = lines[3] if lines.length == 4
+            targetPackage = atom.packages.getActivePackage(packageName)
+            cmd = targetPackage?[method]?(options)
+            cmds.push cmd if cmd
+
           when ':'
             cmdName = line.substring(2)
             switch cmdName
@@ -613,7 +622,7 @@ class PluginCommand extends MacroCommand
     @plugin.toString(tabs)
 
   toSaveString: ->
-    @plugin.toSaveString()
+    @plugin.toSaveString(@options)
 
   instansiateFromSavedString: (str) ->
     @plugin.instansiateFromSavedString(str)
