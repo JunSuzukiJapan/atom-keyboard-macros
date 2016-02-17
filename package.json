@@ -1,7 +1,7 @@
 {
   "name": "atom-keyboard-macros",
   "main": "./lib/atom-keyboard-macros",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "keyboard macro extension for Atom.",
   "keywords": [],
   "activationCommands": {
