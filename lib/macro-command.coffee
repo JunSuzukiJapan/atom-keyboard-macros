@@ -273,7 +273,13 @@ class InputTextCommand extends MacroCommand
 
   execute: ->
     for e in @events
-      atom.keymaps.simulateTextInput(e)
+      if e.keyCode != 0x20
+        atom.keymaps.simulateTextInput(e)
+      else
+        # space(0x20)
+        textInputEvent = document.createEvent("TextEvent")
+        textInputEvent.initTextEvent("textInput", true, true, window, ' ')
+        e.path[0].dispatchEvent(textInputEvent)
 
   toString: (tabs) ->
     result = ''
