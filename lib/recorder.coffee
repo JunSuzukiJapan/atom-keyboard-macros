@@ -18,7 +18,7 @@ class Recorder
   isTextEvent: (e) ->
     stroke = atom.keymaps.keystrokeForKeyboardEvent(e)
     keybind = atom.keymaps.findKeyBindings(keystrokes: stroke, target: @editorElement)
-    keybind.length == 0 and (!e.altKey) and (!e.ctrlKey) and (!e.metaKey)
+    (keybind.length == 0 and (!e.altKey) and (!e.ctrlKey) and (!e.metaKey)) or stroke == 'tab'
 
   start: ->
     @sequence = []
