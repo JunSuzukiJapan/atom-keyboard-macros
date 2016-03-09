@@ -26,11 +26,15 @@ class MacroCommand
       line = lines[index++]
       if line.length == 0
         continue
-      if line[0] != '>' or line.length < 2
+      #if line[0] != '>' or line.length < 2
+      if line[0] != '>'
         console.error 'illegal format when loading macro commands.'
         return null
 
-      name = line.substring(1)
+      if line.length == 1
+        name = ''
+      else
+        name = line.substring(1)
       #console.log('name: ', name)
 
       cmds = []

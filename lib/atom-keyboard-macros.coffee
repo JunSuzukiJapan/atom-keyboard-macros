@@ -236,6 +236,11 @@ module.exports = AtomKeyboardMacros =
 
   save_as: (filename) ->
     str = ''
+    # current macro
+    str += '>\n'
+    for cmd in @macroCommands
+      str += cmd.toSaveString()
+    # named macro
     for name, cmds of @table
       str += '>' + name + '\n'
       for cmd in cmds
@@ -275,7 +280,10 @@ module.exports = AtomKeyboardMacros =
       else
         macros = MacroCommand.loadStringAsMacroCommands text, self.find
         for name, cmds of macros
-          self.addNamedMacroTable(name, cmds)
+          if name.length == 0
+            self.macroCommands = cmds
+          else
+            self.addNamedMacroTable(name, cmds)
 
   # quick_load
   quick_load: ->
