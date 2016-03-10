@@ -43,3 +43,7 @@ class RepeatCountView
 
   setCallback: (callback) ->
     @callback = callback
+
+  focus: ->
+    @input.focus()
+    @input.select()
