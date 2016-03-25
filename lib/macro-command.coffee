@@ -55,15 +55,6 @@ class MacroCommand
               events = []
               for i in [1..line.length-1]
                 event = MacroCommand.keydownEventFromString(line[i])
-                ###
-                switch line[i]
-                  when ' ' # space
-                    event.keyCode = 0x20
-                    event.keyIdentifier = ' '
-                  when '\t' # tab
-                    event.keyCode = 0x09
-                    event.keyIdentifier = '\t'
-                ###
                 events.push event
 
               cmds.push(new InputTextCommand(events))
@@ -290,31 +281,15 @@ class InputTextCommand extends MacroCommand
 
   execute: ->
     for e in @events
-      #switch e.keyCode
-      switch e.keyIdentifier
-        #when 0x20
-        when 'U+20'
-          # space(0x20)
-          #textInputEvent = document.createEvent("TextEvent")
-          #textInputEvent.initTextEvent("textInput", true, true, window, ' ')
-          #e.path[0].dispatchEvent(textInputEvent)
-          atom.workspace.getActiveTextEditor().insertText(' ')
-
-        #when 0x09
-        when 'U+9'
-          # tab(0x09)
-          #textInputEvent = document.createEvent("TextEvent")
-          #textInputEvent.initTextEvent("textInput", true, true, window, '\t')
-          #e.path[0].dispatchEvent(textInputEvent)
-          atom.workspace.getActiveTextEditor().insertText('\t')
-
-        else
-          #atom.keymaps.simulateTextInput(e)
-          if character = characterForKeyboardEvent(e, @dvorakQwertyWorkaroundEnabled)
-            #textInputEvent = document.createEvent("TextEvent")
-            #textInputEvent.initTextEvent("textInput", true, true, window, character)
-            #e.path[0].dispatchEvent(textInputEvent)
-            atom.workspace.getActiveTextEditor().insertText(character)
+      if e.keyIdentifier == 'U+20' or e.keyCode == 0x20
+        # space(0x20)
+        atom.workspace.getActiveTextEditor().insertText(' ')
+      else if e.keyIdentifier == 'U+9' or e.keyCode == 0x09
+        # tab(0x09)
+        atom.workspace.getActiveTextEditor().insertText('\t')
+      else
+        if character = characterForKeyboardEvent(e, @dvorakQwertyWorkaroundEnabled)
+          atom.workspace.getActiveTextEditor().insertText(character)
 
   toString: (tabs) ->
     result = ''
