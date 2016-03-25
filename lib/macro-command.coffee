@@ -1,6 +1,6 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 {CompositeDisposable} = require 'atom'
-{keystrokeForKeyboardEvent, keydownEvent, characterForKeyboardEvent} = require './helpers'
+{keystrokeForKeyboardEvent, keydownEvent, characterForKeyboardEvent, charCodeFromKeyIdentifier} = require './helpers'
 
 class MacroCommand
   @viewInitialized: false
@@ -51,9 +51,22 @@ class MacroCommand
               line = lines[index++]
               if line.length < 2
                 continue
+
+              events = []
               for i in [1..line.length-1]
                 event = MacroCommand.keydownEventFromString(line[i])
-                cmds.push(new InputTextCommand(event))
+                ###
+                switch line[i]
+                  when ' ' # space
+                    event.keyCode = 0x20
+                    event.keyIdentifier = ' '
+                  when '\t' # tab
+                    event.keyCode = 0x09
+                    event.keyIdentifier = '\t'
+                ###
+                events.push event
+
+              cmds.push(new InputTextCommand(events))
 
           when 'D'
             line = lines[index++]
@@ -277,21 +290,31 @@ class InputTextCommand extends MacroCommand
 
   execute: ->
     for e in @events
-      switch e.keyCode
-        when 0x20
+      #switch e.keyCode
+      switch e.keyIdentifier
+        #when 0x20
+        when 'U+20'
           # space(0x20)
-          textInputEvent = document.createEvent("TextEvent")
-          textInputEvent.initTextEvent("textInput", true, true, window, ' ')
-          e.path[0].dispatchEvent(textInputEvent)
+          #textInputEvent = document.createEvent("TextEvent")
+          #textInputEvent.initTextEvent("textInput", true, true, window, ' ')
+          #e.path[0].dispatchEvent(textInputEvent)
+          atom.workspace.getActiveTextEditor().insertText(' ')
 
-        when 0x09
+        #when 0x09
+        when 'U+9'
           # tab(0x09)
-          textInputEvent = document.createEvent("TextEvent")
-          textInputEvent.initTextEvent("textInput", true, true, window, '\t')
-          e.path[0].dispatchEvent(textInputEvent)
+          #textInputEvent = document.createEvent("TextEvent")
+          #textInputEvent.initTextEvent("textInput", true, true, window, '\t')
+          #e.path[0].dispatchEvent(textInputEvent)
+          atom.workspace.getActiveTextEditor().insertText('\t')
 
         else
-          atom.keymaps.simulateTextInput(e)
+          #atom.keymaps.simulateTextInput(e)
+          if character = characterForKeyboardEvent(e, @dvorakQwertyWorkaroundEnabled)
+            #textInputEvent = document.createEvent("TextEvent")
+            #textInputEvent.initTextEvent("textInput", true, true, window, character)
+            #e.path[0].dispatchEvent(textInputEvent)
+            atom.workspace.getActiveTextEditor().insertText(character)
 
   toString: (tabs) ->
     result = ''
@@ -303,7 +326,14 @@ class InputTextCommand extends MacroCommand
   toSaveString: ->
     result = '*I\n'
     for e in @events
-      s = ':' + characterForKeyboardEvent(e) + '\n'
+      character = characterForKeyboardEvent(e)
+      switch e.keyCode
+        when 0x20 # space
+          character = ' '
+        when 0x09 # tab
+          character = '\t'
+      s = ':' + character + '\n'
+      #s = ':' + e.keyIdentifier + ',' + (e.keyCode if e.keyCode)  + ',' + (e.which if e.which) + '\n'
       result += s
     result
 
