@@ -135,7 +135,7 @@ class FindAndReplace
       self.findNext()
       self.findNextMonitor()
     @nextButton.on 'click.atom-keyboard-macros', @nextButtonHook
-    @findEditor.on 'keydown', (key) ->
+    @findEditor.on 'keydown.atom-keyboard-macros', (key) ->
       if(key.keyCode == 13)
         self.findNext()
         self.findNextMonitor()
@@ -160,7 +160,7 @@ class FindAndReplace
     @replaceAllButton.off 'click.atom-keyboard-macros'
     @replaceNextButton.off 'click.atom-keyboard-macros'
     @nextButton.off 'click.atom-keyboard-macros'
-    @findEditor.off 'keydown'
+    @findEditor.off 'keydown.atom-keyboard-macros'
 
   #
   # hook handlers
