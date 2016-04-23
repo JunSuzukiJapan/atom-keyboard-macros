@@ -29,33 +29,6 @@ class FindAndReplace
     @getFindAndReplaceMethods()
 
   deactivate: ->
-    panels = atom.workspace.getBottomPanels()
-
-    for panel in panels
-      item = panel.item
-      name = item?.__proto__?.constructor?.name
-      if name == 'FindView'
-        item.findNext = @findNext
-        item.findPrevious = @findPrevious
-        item.findNextSelected = @findNextSelected
-        item.findPreviousSelected = @findPreviousSelected
-        item.setSelectionAsFindPattern = @setSelectionAsFindPattern
-        item.replaceNext = @replaceNext
-        item.replaceAll = @replaceAll
-
-    ###
-    @replaceAllButton.removeEventListener('on', @replaceAllButtonHook)
-    @replaceNextButton.removeEventListener('on', @replaceNextButtonHook)
-    @nextButton.removeEventListener('on', @nextButtonHook)
-    @regexOptionButton.removeEventListener('on', @regexOptionButtonHook)
-    @caseOptionButton.removeEventListener('on', @caseOptionButtonHook)
-    @selectionOptionButton.removeEventListener('on', @selectionOptionButtonHook)
-    @wholeWordOptionButton.removeEventListener('on', @wholeWordOptionButtonHook)
-    ###
-
-    @replaceAllButton.off 'click.atom-keyboard-macros'
-    @replaceNextButton.off 'click.atom-keyboard-macros'
-    @nextButton.off 'click.atom-keyboard-macros'
 
   #
   # get Methods from FindView
@@ -105,31 +78,6 @@ class FindAndReplace
           @replaceEditor = null
           return
 
-        item.findNext = @findNextMonitor
-        item.findPrevious = @findPreviousMonitor
-        item.findNextSelected = @findNextSelectedMonitor
-        item.findPreviousSelected = @findPreviousSelectedMonitor
-        item.setSelectionAsFindPattern = @setSelectionAsFindPatternMonitor
-        item.replacePrevious = @replacePreviousMonitor
-        item.replaceNext = @replaceNextMonitor
-        item.replaceAll = @replaceAllMonitor
-
-        self = this
-        @replaceAllButtonHook = (e) ->
-          #self.replaceAll()
-          self.replaceAllMonitor()
-        @replaceAllButton.on 'click.atom-keyboard-macros', @replaceAllButtonHook
-
-        @replaceNextButtonHook = (e) ->
-          #self.replaceNext()
-          self.replaceNextMonitor()
-        @replaceNextButton.on 'click.atom-keyboard-macros', @replaceNextButtonHook
-
-        @nextButtonHook = (e) ->
-          self.findNext()
-          self.findNextMonitor()
-        @nextButton.on 'click.atom-keyboard-macros', @nextButtonHook
-
         break
 
   # Util
@@ -152,9 +100,67 @@ class FindAndReplace
 
   startRecording: (@macroSequence)->
     @isRecording = true
+    @addHooks()
 
   stopRecording: ->
+    @removeHooks()
     @isRecording = false
+
+  addHooks: ->
+    if !(@findNext and @findPrevious and @findNextSelected and @findPrevious and @findPreviousSelected and @setSelectionAsFindPattern and @replacePrevious and @replaceNext and @replaceAll and @findEditor and @replaceEditor)
+      return
+
+    item = @findView
+    item.findNext = @findNextMonitor
+    item.findPrevious = @findPreviousMonitor
+    item.findNextSelected = @findNextSelectedMonitor
+    item.findPreviousSelected = @findPreviousSelectedMonitor
+    item.setSelectionAsFindPattern = @setSelectionAsFindPatternMonitor
+    item.replacePrevious = @replacePreviousMonitor
+    item.replaceNext = @replaceNextMonitor
+    item.replaceAll = @replaceAllMonitor
+
+    self = this
+    @replaceAllButtonHook = (e) ->
+      #self.replaceAll()
+      self.replaceAllMonitor()
+    @replaceAllButton.on 'click.atom-keyboard-macros', @replaceAllButtonHook
+
+    @replaceNextButtonHook = (e) ->
+      #self.replaceNext()
+      self.replaceNextMonitor()
+    @replaceNextButton.on 'click.atom-keyboard-macros', @replaceNextButtonHook
+
+    @nextButtonHook = (e) ->
+      self.findNext()
+      self.findNextMonitor()
+    @nextButton.on 'click.atom-keyboard-macros', @nextButtonHook
+    @findEditor.on 'keydown', (key) ->
+      if(key.keyCode == 13)
+        self.findNext()
+        self.findNextMonitor()
+
+
+
+  removeHooks: ->
+    panels = atom.workspace.getBottomPanels()
+
+    for panel in panels
+      item = panel.item
+      name = item?.__proto__?.constructor?.name
+      if name == 'FindView'
+        item.findNext = @findNext
+        item.findPrevious = @findPrevious
+        item.findNextSelected = @findNextSelected
+        item.findPreviousSelected = @findPreviousSelected
+        item.setSelectionAsFindPattern = @setSelectionAsFindPattern
+        item.replaceNext = @replaceNext
+        item.replaceAll = @replaceAll
+
+    @replaceAllButton.off 'click.atom-keyboard-macros'
+    @replaceNextButton.off 'click.atom-keyboard-macros'
+    @nextButton.off 'click.atom-keyboard-macros'
+    @findEditor.off 'keydown'
 
   #
   # hook handlers
@@ -163,6 +169,7 @@ class FindAndReplace
   # findNext: (options={focusEditorAfter: false}) =>
   findNextMonitor: ->
     if not @isRecording
+      #@findNext?()
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindNextCommand(this, @getFindText(), options))
@@ -170,6 +177,7 @@ class FindAndReplace
   #findPrevious: (options={focusEditorAfter: false}) =>
   findPreviousMonitor: ->
     if not @isRecording
+      @findPrevious?()
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindPreviousCommand(this, @getFindText(), options))
@@ -177,6 +185,7 @@ class FindAndReplace
   # findNextSelected: =>
   findNextSelectedMonitor: ->
     if not @isRecording
+      @findNextSelected?()
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindNextSelectedCommand(this, @getFindText(), options))
@@ -184,6 +193,7 @@ class FindAndReplace
   # findPreviousSelected: =>
   findPreviousSelectedMonitor: ->
     if not @isRecording
+      @findPreviousSelected?()
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindPreviousSelectedCommand(this, @getFindText(), options))
@@ -191,6 +201,7 @@ class FindAndReplace
   # setSelectionAsFindPattern: =>
   setSelectionAsFindPatternMonitor: ->
     if not @isRecording
+      @setSelectionAsFindPattern?()
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new SetSelectionAsFindPatternCommand(this), options)
@@ -198,6 +209,7 @@ class FindAndReplace
   # replacePrevious: =>
   replacePreviousMonitor: ->
     if not @isRecording
+      @replacePrevious?()
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new ReplacePreviousCommand(this, @getFindText(), @getReplaceText(), options))
@@ -205,6 +217,7 @@ class FindAndReplace
   # replaceNext: =>
   replaceNextMonitor: ->
     if not @isRecording
+      @replaceNext?()
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new ReplaceNextCommand(this, @getFindText(), @getReplaceText(), options))
@@ -212,6 +225,7 @@ class FindAndReplace
   # replaceAll: =>
   replaceAllMonitor: ->
     if not @isRecording
+      @replaceAll?()
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new ReplaceAllCommand(this, @getFindText(), @getReplaceText(), options))
