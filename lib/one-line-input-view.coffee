@@ -33,7 +33,7 @@ class OneLineInputView
     @focus()
 
   hide: ->
-    @panel.hide()
+    @panel.hide?()
 
   escapeListener: (e) =>
     keystroke = atom.keymaps.keystrokeForKeyboardEvent(e)
