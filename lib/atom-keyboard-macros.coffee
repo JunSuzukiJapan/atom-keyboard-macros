@@ -2,7 +2,9 @@ AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 RepeatCountView = require './repeat-count-view'
 OneLineInputView = require './one-line-input-view'
 {CompositeDisposable} = require 'atom'
-{normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
+#{normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require './helpers'
+#{normalizeKeystrokes, keystrokeForKeyboardEvent, isAtomModifier, keydownEvent, characterForKeyboardEvent} = require 'atom-keymap'
+#AtomKeymap = require 'atom-keymap'
 Recorder = require './recorder'
 {MacroCommand, DispatchCommand, PluginCommand} = require './macro-command'
 fs = require 'fs'
@@ -119,6 +121,10 @@ module.exports = AtomKeyboardMacros =
   keyboardEventHandler: (e) ->
     if e.target?.className?.indexOf('editor mini') >= 0
       return
+    className = e.target?.parentNode?.parentNode?.parentNode?.parentNode?.className
+    if className == "editor mini is-focused"
+      return
+
     @recorder.add(e)
 
   #

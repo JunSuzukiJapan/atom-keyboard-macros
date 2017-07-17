@@ -40,6 +40,8 @@ class Recorder
   add: (e) ->
     if(e.keyIdentifier?.match(/Control|Shift|Alt|Meta|Cmd/)) # skip meta keys
       return
+    if(e.key?.match(/Control|Shift|Alt|Meta|Cmd/)) # skip meta keys
+      return
 
     if @isTextEvent(e)
       if @currentMode and @currentMode == TextMode

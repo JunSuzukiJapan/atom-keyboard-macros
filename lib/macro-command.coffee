@@ -422,7 +422,11 @@ class FindNextCommand extends FRBaseCommand
     @setOptions(@findAndReplace)
     # execute
     @findAndReplace.setFindText(@text)
-    @findAndReplace.findNext(@options)
+    #@findAndReplace.findNext(@options)
+    findView = @findAndReplace.findView
+    findView.findNext = @findAndReplace.findNext
+    findView.findNext()
+    findView.findNext = @findAndReplace.findNextMonitor
 
   toString: (tabs) ->
     result = ''
@@ -449,7 +453,11 @@ class FindPreviousCommand extends FRBaseCommand
     @setOptions(@findAndReplace)
     # execute
     @findAndReplace.setText(@text)
-    @findAndReplace.findPrevious()
+    #@findAndReplace.findPrevious()
+    findView = @findAndReplace.findView
+    findView.findPrevious = @findAndReplace.findPrevious
+    findView.findPrevious?()
+    findView.findPrevious = @findAndReplace.findPrevious
 
   toString: (tabs) ->
     result = ''
@@ -476,7 +484,11 @@ class FindNextSelectedCommand extends FRBaseCommand
     @setOptions(@findAndReplace)
     # execute
     @findAndReplace.setText(@text)
-    @findAndReplace.findNextSecected()
+    #@findAndReplace.findNextSecected()
+    findView = @findAndReplace.findView
+    findView.findNextSecected = @findAndReplace.findNextSecected
+    findView.findNextSecected?()
+    findView.findNextSecected = @findAndReplace.findNextSelectedMonitor
 
   toString: (tabs) ->
     result = ''
@@ -503,7 +515,11 @@ class FindPreviousSelectedCommand extends FRBaseCommand
     @setOptions(@findAndReplace)
     # execute
     @findAndReplace.setFindText(@text)
-    @findAndReplace.findPreviousSelected()
+    #@findAndReplace.findPreviousSelected()
+    findView = @findAndReplace.findView
+    findView.findPreviousSelected = @findAndReplace.findPreviousSelected
+    findView.findPreviousSelected?()
+    findView.findPreviousSelected = @findAndReplace.findPreviousSelectedMonitor
 
   toString: (tabs) ->
     result = ''
@@ -529,7 +545,11 @@ class SetSelectionAsFindPatternCommand extends FRBaseCommand
     # set options
     @setOptions(@findAndReplace)
     # execute
-    @findAndReplace.setSelectionAsFindPattern()
+    #@findAndReplace.setSelectionAsFindPattern()
+    findView = @findAndReplace.findView
+    findView.setSelectionAsFindPattern = @findAndReplace.setSelectionAsFindPattern
+    findView.setSelectionAsFindPattern?()
+    findView.setSelectionAsFindPattern = @findAndReplace.setSelectionAsFindPatternMonitor
 
   toString: (tabs) ->
     result = ''
@@ -555,7 +575,11 @@ class ReplacePreviousCommand extends FRBaseCommand
     # execute
     @findAndReplace.setFindText(@findText)
     @findAndReplace.setReplaceText(@replaceText)
-    @findAndReplace.replacePrevious()
+    #@findAndReplace.replacePrevious()
+    findView = @findAndReplace.findView
+    findView.replacePrevious = @findAndReplace.replacePrevious
+    findView.replacePrevious?()
+    findView.replacePrevious = @findAndReplace.replacePreviousMonitor
 
   toString: (tabs) ->
     result = ''
@@ -585,7 +609,11 @@ class ReplaceNextCommand extends FRBaseCommand
     # execute
     @findAndReplace.setFindText(@findText)
     @findAndReplace.setReplaceText(@replaceText)
-    @findAndReplace.replaceNext()
+    #@findAndReplace.replaceNext()
+    findView = @findAndReplace.findView
+    findView.replaceNext = @findAndReplace.replaceNext
+    findView.replaceNext?()
+    findView.replaceNext = @findAndReplace.replaceNextMonitor
 
   toString: (tabs) ->
     result = ''
@@ -615,7 +643,11 @@ class ReplaceAllCommand extends FRBaseCommand
     # execute
     @findAndReplace.setFindText(@findText)
     @findAndReplace.setReplaceText(@replaceText)
-    @findAndReplace.replaceAll()
+    #@findAndReplace.replaceAll()
+    findView = @findAndReplace.findView
+    findView.replaceAll = @findAndReplace.replaceAll
+    findView.replaceAll?()
+    findView.replaceAll = @findAndReplace.replaceAllMonitor
 
   toString: (tabs) ->
     result = ''
