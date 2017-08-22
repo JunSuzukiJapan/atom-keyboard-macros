@@ -53,15 +53,17 @@
     "url": "https://github.com/JunSuzukiJapan/atom-keyboard-macros/issues"
   },
   "dependencies": {
+    "atom-keymap": "^8.2.4",
     "atom-space-pen-views": "^2.1.1",
-    "atom-keymap": "^8.0.2",
     "fuzzaldrin": "^2.1.0",
     "fuzzaldrin-plus": "^0.3.1"
   },
   "description": "keyboard macro extension for Atom.",
-  "devDependencies": {},
+  "devDependencies": {
+    "electron-rebuild": "^1.6.0"
+  },
   "engines": {
-    "atom": ">=1.18.0 <2.0.0"
+    "atom": ">=1.19.0 <2.0.0"
   },
   "homepage": "https://github.com/JunSuzukiJapan/atom-keyboard-macros#readme",
   "keywords": [],

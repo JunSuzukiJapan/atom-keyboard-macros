@@ -1,6 +1,13 @@
 AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 {CompositeDisposable} = require 'atom'
-{keystrokeForKeyboardEvent, keydownEvent, characterForKeyboardEvent, charCodeFromKeyIdentifier} = require './helpers'
+
+KeymapManager = require 'atom-keymap'
+keymaps = new KeymapManager
+keystrokeForKeyboardEvent = keymaps.keystrokeForKeyboardEvent
+keydownEvent = keymaps.keydownEvent
+charCodeFromKeyIdentifier = keymaps.charCodeFromKeyIdentifier
+characterForKeyboardEvent = (event) ->
+  event.key if event.key.length is 1 and not (event.ctrlKey or event.metaKey)
 
 class MacroCommand
   @viewInitialized: false

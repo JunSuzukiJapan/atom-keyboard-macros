@@ -1,6 +1,10 @@
 {CompositeDisposable} = require 'atom'
-{keystrokeForKeyboardEvent, keydownEvent, characterForKeyboardEvent} = require './helpers'
 {FindNextCommand, FindPreviousCommand, FindNextSelectedCommand, FindPreviousSelectedCommand, SetSelectionAsFindPatternCommand, ReplacePreviousCommand, ReplaceNextCommand, ReplaceAllCommand} = require './macro-command'
+KeymapManager = require 'atom-keymap'
+keymaps = new KeymapManager
+keystrokeForKeyboardEvent = keymaps.keystrokeForKeyboardEvent
+keydownEvent = keymaps.keydownEvent
+charCodeFromKeyIdentifier = keymaps.charCodeFromKeyIdentifier
 
 module.exports =
 class FindAndReplace
@@ -191,10 +195,9 @@ class FindAndReplace
   #findPrevious: (options={focusEditorAfter: false}) =>
   findPreviousMonitor: ->
     if not @isRecording
-      #@findPrevious?()
-      self.findView.findPrevious = self.findPrevious
-      self.findView.findPrevious?()
-      self.findView.findPrevious = self.findPreviousMonitor
+      this.findView.findPrevious = self.findPrevious
+      this.findView.findPrevious?()
+      this.findView.findPrevious = self.findPreviousMonitor
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindPreviousCommand(this, @getFindText(), options))
@@ -202,10 +205,9 @@ class FindAndReplace
   # findNextSelected: =>
   findNextSelectedMonitor: ->
     if not @isRecording
-      #@findNextSelected?()
-      self.findView.findNextSelected = self.findNextSelected
-      self.findView.findNextSelected?()
-      self.findView.findNextSelected = self.findNextSelectedMonitor
+      this.findView.findNextSelected = self.findNextSelected
+      this.findView.findNextSelected?()
+      this.findView.findNextSelected = self.findNextSelectedMonitor
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindNextSelectedCommand(this, @getFindText(), options))
@@ -213,10 +215,9 @@ class FindAndReplace
   # findPreviousSelected: =>
   findPreviousSelectedMonitor: ->
     if not @isRecording
-      #@findPreviousSelected?()
-      self.findView.findPreviousSelected = self.findPreviousSelected
-      self.findView.findPreviousSelected?()
-      self.findView.findPreviousSelected = self.findPreviousSelectedMonitor
+      this.findView.findPreviousSelected = self.findPreviousSelected
+      this.findView.findPreviousSelected?()
+      this.findView.findPreviousSelected = self.findPreviousSelectedMonitor
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new FindPreviousSelectedCommand(this, @getFindText(), options))
@@ -224,10 +225,9 @@ class FindAndReplace
   # setSelectionAsFindPattern: =>
   setSelectionAsFindPatternMonitor: ->
     if not @isRecording
-      #@setSelectionAsFindPattern?()
-      self.findView.setSelectionAsFindPattern = self.setSelectionAsFindPattern
-      self.findView.setSelectionAsFindPattern?()
-      self.findView.setSelectionAsFindPattern = self.setSelectionAsFindPatternMonitor
+      this.findView.setSelectionAsFindPattern = self.setSelectionAsFindPattern
+      this.findView.setSelectionAsFindPattern?()
+      this.findView.setSelectionAsFindPattern = self.setSelectionAsFindPatternMonitor
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new SetSelectionAsFindPatternCommand(this), options)
@@ -235,10 +235,9 @@ class FindAndReplace
   # replacePrevious: =>
   replacePreviousMonitor: ->
     if not @isRecording
-      #@replacePrevious?()
-      self.findView.replacePrevious = self.replacePrevious
-      self.findView.replacePrevious?()
-      self.findView.replacePrevious = self.replacePreviousMonitor
+      this.findView.replacePrevious = self.replacePrevious
+      this.findView.replacePrevious?()
+      this.findView.replacePrevious = self.replacePreviousMonitor
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new ReplacePreviousCommand(this, @getFindText(), @getReplaceText(), options))
@@ -246,10 +245,9 @@ class FindAndReplace
   # replaceNext: =>
   replaceNextMonitor: ->
     if not @isRecording
-      #@replaceNext?()
-      self.findView.replaceNext = self.replaceNext
-      self.findView.replaceNext?()
-      self.findView.replaceNext = self.replaceNextMonitor
+      this.findView.replaceNext = self.replaceNext
+      this.findView.replaceNext?()
+      this.findView.replaceNext = self.replaceNextMonitor
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new ReplaceNextCommand(this, @getFindText(), @getReplaceText(), options))
@@ -257,10 +255,9 @@ class FindAndReplace
   # replaceAll: =>
   replaceAllMonitor: ->
     if not @isRecording
-      #@replaceAll?()
-      self.findView.replaceAll = self.replaceAll
-      self.findView.replaceAll?()
-      self.findView.replaceAll = self.replaceAllMonitor
+      this.findView.replaceAll = self.replaceAll
+      this.findView.replaceAll?()
+      this.findView.replaceAll = self.replaceAllMonitor
       return
     options = @findView.model?.getFindOptions()
     @macroSequence.push(new ReplaceAllCommand(this, @getFindText(), @getReplaceText(), options))
