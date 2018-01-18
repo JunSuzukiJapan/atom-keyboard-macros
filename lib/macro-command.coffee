@@ -4,7 +4,7 @@ AtomKeyboardMacrosView = require './atom-keyboard-macros-view'
 KeymapManager = require 'atom-keymap'
 keymaps = new KeymapManager
 keystrokeForKeyboardEvent = keymaps.keystrokeForKeyboardEvent
-keydownEvent = keymaps.keydownEvent
+#keydownEvent = keymaps.keydownEvent
 charCodeFromKeyIdentifier = keymaps.charCodeFromKeyIdentifier
 characterForKeyboardEvent = (event) ->
   event.key if event.key.length is 1 and not (event.ctrlKey or event.metaKey)
@@ -236,6 +236,9 @@ class MacroCommand
 
     result
 
+  @keydownEvent: (dic) ->
+    new KeyboardEvent("keydown", dic)
+
   @keydownEventFromString: (keystroke) ->
     hasCtrl = keystroke.indexOf('ctrl-') > -1
     hasAlt = keystroke.indexOf('alt-') > -1
@@ -245,7 +248,8 @@ class MacroCommand
     s = s.replace('alt-', '')
     s = s.replace('shift-', '')
     key = s.replace('cmd-', '')
-    event = keydownEvent(key, {
+    event = @keydownEvent({
+      key: key
       ctrl: hasCtrl
       alt: hasAlt
       shift: hasShift
@@ -288,10 +292,10 @@ class InputTextCommand extends MacroCommand
 
   execute: ->
     for e in @events
-      if e.keyIdentifier == 'U+20' or e.keyCode == 0x20
+      if e.key == 'U+20' or e.keyCode == 0x20
         # space(0x20)
         atom.workspace.getActiveTextEditor().insertText(' ')
-      else if e.keyIdentifier == 'U+9' or e.keyCode == 0x09
+      else if e.key == 'U+9' or e.keyCode == 0x09
         # tab(0x09)
         atom.workspace.getActiveTextEditor().insertText('\t')
       else
@@ -315,7 +319,7 @@ class InputTextCommand extends MacroCommand
         when 0x09 # tab
           character = '\t'
       s = ':' + character + '\n'
-      #s = ':' + e.keyIdentifier + ',' + (e.keyCode if e.keyCode)  + ',' + (e.which if e.which) + '\n'
+      #s = ':' + e.key + ',' + (e.keyCode if e.keyCode)  + ',' + (e.which if e.which) + '\n'
       result += s
     result
 
@@ -380,9 +384,9 @@ class KeydownCommand extends MacroCommand
       result += tabs + "cmd = #{e.metaKey}\n"
       result += tabs + "shift = #{e.shiftKey}\n"
       result += tabs + "keyCode = #{e.keyCode}\n"
-      result += tabs + "keyIdentifier = #{e.keyIdentifier}\n"
+      result += tabs + "key = #{e.key}\n"
       result += tabs + "location ?= KeyboardEvent.DOM_KEY_LOCATION_STANDARD\n"
-      result += tabs + "event.initKeyboardEvent('keydown', bubbles, cancelable, view,  keyIdentifier, location, ctrl, alt, shift, cmd)\n"
+      result += tabs + "event.initKeyboardEvent('keydown', bubbles, cancelable, view,  key, location, ctrl, alt, shift, cmd)\n"
       result += tabs + "Object.defineProperty(event, 'keyCode', get: -> keyCode)\n"
       result += tabs + "Object.defineProperty(event, 'which', get: -> keyCode)\n"
       result += tabs + "atom.keymaps.handleKeyboardEvent(event)\n"

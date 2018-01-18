@@ -19,7 +19,7 @@ class RepeatCountView
     @input.type = 'number'
     @input.defaultValue = 1
     #@input.onkeydown = (e) ->
-    #  if e.keyIdentifier == 'Enter' and self.callback
+    #  if e.key == 'Enter' and self.callback
     #    self.callback(self.input.value)
     message.appendChild(@input)
 

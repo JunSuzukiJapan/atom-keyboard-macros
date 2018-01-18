@@ -38,7 +38,7 @@ class Recorder
     @sequence
 
   add: (e) ->
-    if(e.keyIdentifier?.match(/Control|Shift|Alt|Meta|Cmd/)) # skip meta keys
+    if(e.key?.match(/Control|Shift|Alt|Meta|Cmd/)) # skip meta keys
       return
     if(e.key?.match(/Control|Shift|Alt|Meta|Cmd/)) # skip meta keys
       return

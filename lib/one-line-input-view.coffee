@@ -19,7 +19,7 @@ class OneLineInputView
     @editorElement.setModel(@editor)
     self = this
     @editorElement.onkeydown = (e) ->
-      if e.keyIdentifier == 'Enter'
+      if e.key == 'Enter'
         value = self.editor.getText()
         self.clearText()
         self.hide()

@@ -236,6 +236,10 @@ module.exports = AtomKeyboardMacros =
         atom.views.getView(editor).focus()
 
   save_as: (filename) ->
+    if @macroCommands == null
+      atom.beep()
+      return
+
     str = ''
     # current macro
     str += '>\n'
