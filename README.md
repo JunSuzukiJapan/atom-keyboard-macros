@@ -24,7 +24,7 @@ In version 0.6.0 or later, it also records the operation of the search & replace
 
 - atom-keyboard-macros:name_last_kbd_macro
     Give a command name to the most recently defined keyboard macro.
-    You can execute it, in command palette, use 'atom-keyboard-macros:{a-command-name}'.
+    You can execute it, in command palette, use 'atom-keyboard-macros.user:{a-command-name}'.
 
 - atom-keyboard-macros:execute_named_macro
     Execute a named keyboard macro(see atom-keyboard-macros:name_last_kbd_macro).
